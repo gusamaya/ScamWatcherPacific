@@ -139,7 +139,8 @@ def call_claude(images, country="", channel="", notes=""):
     content.append({
         "type": "text",
         "text": "Review the message in the screenshot(s) above.\n\n" + "\n".join(context)
-                + "\n\nRecord your review with the record_review tool.",
+                + "\n\nRecord your review by calling the record_review tool. "
+                  "If you can't call it, reply with only a JSON object using the same fields.",
     })
 
     body = json.dumps({
@@ -147,7 +148,9 @@ def call_claude(images, country="", channel="", notes=""):
         "max_tokens": 2000,
         "system": SYSTEM_PROMPT,
         "tools": [REVIEW_TOOL],
-        "tool_choice": {"type": "tool", "name": "record_review"},
+        # Some models don't allow forcing a specific tool, so the prompt asks
+        # for it and the reply is also accepted as plain JSON.
+        "tool_choice": {"type": "auto"},
         "messages": [{"role": "user", "content": content}],
     }).encode("utf-8")
 
@@ -168,10 +171,39 @@ def call_claude(images, country="", channel="", notes=""):
         detail = exc.read().decode("utf-8", "replace")[:300]
         raise RuntimeError(f"Claude API error {exc.code}: {detail}") from None
 
+    text_parts = []
     for block in payload.get("content", []):
         if block.get("type") == "tool_use" and block.get("name") == "record_review":
             return block.get("input") or {}
-    raise RuntimeError("Claude did not return a review.")
+        if block.get("type") == "text":
+            text_parts.append(block.get("text") or "")
+
+    parsed = _json_from_text("\n".join(text_parts))
+    if parsed and parsed.get("risk_rating"):
+        return parsed
+    raise RuntimeError("Claude did not return a review in the expected format.")
+
+
+def _json_from_text(text):
+    """Pull the first JSON object out of a text reply, or return None."""
+    start = text.find("{")
+    while start != -1:
+        depth = 0
+        for i in range(start, len(text)):
+            if text[i] == "{":
+                depth += 1
+            elif text[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        value = json.loads(text[start:i + 1])
+                        if isinstance(value, dict):
+                            return value
+                    except ValueError:
+                        break
+                    break
+        start = text.find("{", start + 1)
+    return None
 
 
 # ----------------------------------------------------------------------
@@ -338,7 +370,9 @@ def review_pending(limit=20):
         WHERE LOWER(COALESCE(response_status, '')) = 'manual'
           AND COALESCE(screenshot_files, '[]') <> '[]'
           AND auto_review IS NULL
-          AND auto_review_error IS NULL
+          -- Retry earlier failures (e.g. an outage or a fixed bug) on each
+          -- start-up, but not images Claude can't read at all.
+          AND COALESCE(auto_review_error, '') NOT LIKE 'No screenshot%'
         ORDER BY id ASC
         LIMIT ?
         """,
