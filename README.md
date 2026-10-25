@@ -26,6 +26,13 @@ It is a separate copy of the ScamWatcher (Australia) MVP, with its own mailbox, 
 2. The submission always goes to **Needs manual review**. No automatic reply is sent to the address typed into the form.
 3. The person is sent back to the website with a confirmation message.
 
+**Automatic screenshot review**
+When `ANTHROPIC_API_KEY` is set, every screenshot (from the form or an email) is sent to Claude, which reads the message, translates any Pacific-language text, and drafts an assessment, scam type, advice and observations. The rule-based checks also run on the text it read, as a cross-check. The submission then moves to **Needs approval** with a "Draft written by the automatic review" note, and the text read from the screenshot is shown next to the image. A person still approves every reply, and screenshot submissions are never auto-sent.
+
+If the review fails (or the photo is an iPhone HEIC, which Claude can't read), the submission stays in **Needs manual review** with the reason shown, and **Review the screenshot again** retries it. Screenshots that arrived before the key was set are reviewed when the app next starts. The model is set with `CLAUDE_MODEL` (default `claude-sonnet-5-5`).
+
+Because screenshots go to Anthropic for reading, the website's privacy section says so. Keep that wording if you keep the feature on.
+
 **Replying to a manual submission**
 Open it, look at the screenshot, choose an assessment, write what they should do and what you noticed, then **Save reply**. Check the preview and **Approve and send**. The reply comes from `check@scamwatcherpacific.com`.
 

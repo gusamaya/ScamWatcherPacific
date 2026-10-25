@@ -32,6 +32,8 @@ services:
         value: check@scamwatcherpacific.com
       - key: EMAIL_PASSWORD      # app password for the mailbox
         sync: false
+      - key: ANTHROPIC_API_KEY   # turns on automatic screenshot review
+        sync: false
       - key: RETENTION_DAYS      # must match "Deleted after [X] days" on the site
         sync: false
       # Where the form sends people back to. Starts as the website service

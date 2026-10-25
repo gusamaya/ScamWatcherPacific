@@ -546,6 +546,15 @@ def main():
                     screenshot_files = _save_screenshots(email_record)
                     _insert_submission_flexible(insert_submission, email_record, clean, screenshot_files)
 
+                    if screenshot_files:
+                        try:
+                            import auto_review
+                            saved = database.get_submission_by_message_id(message_id)
+                            if saved:
+                                auto_review.review_in_background(saved["id"])
+                        except Exception as exc:
+                            _log(f"Automatic review not started: {exc}")
+
                     try:
                         _mark_as_read(mark_email_as_read, email_record)
                     except Exception as exc:

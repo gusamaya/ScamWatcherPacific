@@ -48,6 +48,9 @@ def ensure_columns():
         "channel": "TEXT",
         "screenshot_files": "TEXT",
         "created_at": "TEXT",
+        "screenshot_text": "TEXT",
+        "auto_review": "TEXT",
+        "auto_review_error": "TEXT",
     }
 
     for column_name, column_type in required_columns.items():

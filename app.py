@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import auto_review
 import database
 import uploads
 
@@ -374,6 +375,9 @@ def ensure_schema():
         "channel": "TEXT",
         "screenshot_files": "TEXT",
         "created_at": "TEXT",
+        "screenshot_text": "TEXT",
+        "auto_review": "TEXT",
+        "auto_review_error": "TEXT",
     }
 
     for column_name, column_type in required_columns.items():
@@ -402,6 +406,7 @@ def prepare_submission_record(data):
         data["review_checks"] = []
 
     data["screenshot_files"] = [str(n) for n in parse_json_list(data.get("screenshot_files")) if n]
+    data["auto_review"] = parse_json_dict(data.get("auto_review"))
 
     if data["attachment_names"]:
         data["has_attachments"] = 1
@@ -1136,10 +1141,27 @@ def start_retention_thread():
     print(f"[Retention] Started. Deleting submissions older than {RETENTION_DAYS} days.", flush=True)
 
 
+_catch_up_started = False
+
+
+def start_auto_review_catch_up():
+    """Review screenshots that arrived before automatic review was switched on."""
+    global _catch_up_started
+    if _catch_up_started:
+        return
+    _catch_up_started = True
+    if not auto_review.is_enabled():
+        print("[AutoReview] ANTHROPIC_API_KEY is not set, so screenshots wait for a manual review.", flush=True)
+        return
+    print(f"[AutoReview] On, using {auto_review.CLAUDE_MODEL}.", flush=True)
+    threading.Thread(target=auto_review.review_pending, daemon=True).start()
+
+
 def start_background_threads():
     start_auto_send_thread()
     start_inbox_worker_thread()
     start_retention_thread()
+    start_auto_review_catch_up()
 
 
 def get_filter_counts():
@@ -1253,6 +1275,7 @@ app.jinja_env.globals["auto_send_enabled"] = AUTO_SEND_ENABLED
 app.jinja_env.globals["brand_name"] = BRAND_NAME
 app.jinja_env.globals["reference_prefix"] = REFERENCE_PREFIX
 app.jinja_env.globals["retention_days"] = RETENTION_DAYS
+app.jinja_env.globals["auto_review_enabled"] = auto_review.is_enabled()
 
 
 @app.template_filter("clean_sender")
@@ -1379,6 +1402,11 @@ def submission_detail(submission_id):
             flash(message, "success" if success else "error")
             return redirect(url_for("submission_detail", submission_id=submission_id))
 
+        if action == "auto_review":
+            success, message = auto_review.review_submission(submission_id, force=True)
+            flash(message, "success" if success else "error")
+            return redirect(url_for("submission_detail", submission_id=submission_id))
+
         if action == "save_reply":
             success, message = save_manual_reply(submission_id, request.form)
             flash(message, "success" if success else "error")
@@ -1495,8 +1523,9 @@ def intake():
         return _back_to_site("empty")
 
     subject = f"Website form · {channel}" + (f" · {country}" if country else "")
+    message_id = f"web-{uuid.uuid4()}"
     database.insert_submission(
-        message_id=f"web-{uuid.uuid4()}",
+        message_id=message_id,
         received_at=now(),
         from_header="",
         subject=subject,
@@ -1522,6 +1551,11 @@ def intake():
         needs_manual_review=True,
     )
     print(f"[Intake] Website submission received ({channel}{', ' + country if country else ''}).", flush=True)
+
+    if stored:
+        saved = database.get_submission_by_message_id(message_id)
+        if saved:
+            auto_review.review_in_background(saved["id"])
     return _back_to_site("ok")
 
 

@@ -848,3 +848,10 @@ a { color: var(--navy-700); }
 
 .rail-card .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; color: var(--ink-2); margin-bottom: 10px; }
 .rail-card .check input { margin-top: 3px; }
+
+.auto-note { margin: 16px 0 0; background: var(--info-bg); border-color: var(--info-line); color: var(--navy-800); }
+.auto-note strong { display: block; }
+.read-panel { padding: 16px 20px; display: grid; gap: 10px; }
+.read-panel .original-body { margin: 0; }
+.read-panel .helper { margin: 0; }
+.read-meta { margin: 0; }

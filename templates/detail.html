@@ -6,6 +6,7 @@
 {% set rk = 'manual' if status == 'manual' else ('high' if 'high' in rating else ('attn' if ('attention' in rating or 'medium' in rating) else 'low')) %}
 {% set is_web = s.submission_type == 'web_form' %}
 {% set shots = s.screenshot_files or [] %}
+{% set ar = s.auto_review or {} %}
 {% set score = s.risk_score if s.risk_score is not none else 0 %}
 {% set review_status = (s.review_status or 'unreviewed')|lower %}
 {% set tag_text = {'fail': 'Warning', 'caution': 'Caution', 'pass': 'OK', 'info': 'Info'} %}
@@ -46,7 +47,13 @@
             <div class="verdict-result">
                 <div>
                     <p class="verdict-rating is-manual">Needs manual review</p>
-                    <p class="verdict-action">{% if shots %}This submission includes a screenshot, which the automatic checks can't read. Look at it below and write the reply.{% else %}A reviewer needs to read this submission and write the reply.{% endif %}</p>
+                    <p class="verdict-action">
+                        {% if s.auto_review_error %}The automatic review couldn't finish, so this needs a manual review. Look at the screenshot below and write the reply.
+                        {% elif shots and auto_review_enabled %}The automatic review is reading the screenshot. Refresh in a minute, or write the reply yourself below.
+                        {% elif shots %}This submission includes a screenshot. Automatic review is off (no API key), so look at it below and write the reply.
+                        {% else %}A reviewer needs to read this submission and write the reply.{% endif %}
+                    </p>
+                    {% if s.auto_review_error %}<p class="callout is-error">{{ s.auto_review_error }}</p>{% endif %}
                 </div>
             </div>
             {% else %}
@@ -65,6 +72,13 @@
                     <div class="meter-scale" aria-hidden="true"><span>Low</span><span>Attention</span><span>High</span></div>
                 </div>
             </div>
+            {% if ar %}
+            <p class="callout auto-note">
+                <strong>Draft written by the automatic review.</strong>
+                Claude read the screenshot{% if ar.confidence %} (confidence: {{ ar.confidence|lower }}){% endif %}. Check the screenshot and the text it read before you send.
+                {% if ar.readable == false %}It couldn't read the image clearly, so review it yourself.{% endif %}
+            </p>
+            {% endif %}
             {% endif %}
         </section>
 
@@ -81,6 +95,23 @@
                     {% endif %}
                 {% endfor %}
                 <p class="helper">Screenshots open only for signed-in reviewers. Don't forward them outside the review team.</p>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if s.screenshot_text or ar %}
+        <section class="section" aria-labelledby="read-title">
+            <h2 class="section-title" id="read-title">Text read from the screenshot</h2>
+            <div class="panel read-panel">
+                {% if ar.platform or ar.sender %}
+                <dl class="meta read-meta">
+                    {% if ar.platform %}<dt>Looks like</dt><dd>{{ ar.platform }}</dd>{% endif %}
+                    {% if ar.sender %}<dt>Sender shown</dt><dd>{{ ar.sender }}</dd>{% endif %}
+                    {% if ar.links %}<dt>Links shown</dt><dd>{{ ar.links|join(', ') }}</dd>{% endif %}
+                </dl>
+                {% endif %}
+                <pre class="original-body">{{ s.screenshot_text or 'No text could be read.' }}</pre>
+                <p class="helper">Read automatically and may contain mistakes. Compare it with the screenshot.</p>
             </div>
         </section>
         {% endif %}
@@ -119,7 +150,7 @@
         </section>
         {% endif %}
 
-        {% if not is_web %}
+        {% if not is_web or s.review_checks %}
         <section class="section" aria-labelledby="checks-title">
             <h2 class="section-title" id="checks-title">How it was checked</h2>
             <div class="panel">
@@ -244,6 +275,21 @@
                 {% endif %}
             </form>
         </section>
+
+        {% if shots and status not in ('sent', 'sending') %}
+        <section class="panel rail-card">
+            <h2 class="rail-title">Automatic review</h2>
+            {% if auto_review_enabled %}
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-quiet" name="action" value="auto_review">{% if ar %}Review the screenshot again{% else %}Review the screenshot now{% endif %}</button>
+            </form>
+            <p class="helper">{% if ar %}Replaces the current draft{% if s.recommended_action %}, including any edits{% endif %}. Takes up to a minute.{% else %}Claude reads the screenshot and drafts the assessment. Takes up to a minute.{% endif %}</p>
+            {% else %}
+            <p class="helper">Off. Add ANTHROPIC_API_KEY to the dashboard's environment in Render to switch it on.</p>
+            {% endif %}
+        </section>
+        {% endif %}
 
         <section class="panel rail-card">
             <h2 class="rail-title">Your assessment</h2>
