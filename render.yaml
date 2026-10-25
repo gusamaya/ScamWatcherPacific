@@ -1,0 +1,74 @@
+# Render Blueprint for ScamWatcher Pacific.
+# In Render: New > Blueprint > pick this repository. Render creates both
+# services below and asks you for the values marked sync: false.
+
+services:
+  # Review dashboard, inbox worker and the website form's /intake.
+  - type: web
+    name: scamwatcherpacific-dashboard
+    runtime: python
+    region: singapore          # closest Render region to the Pacific
+    plan: starter              # a persistent disk needs a paid plan
+    buildCommand: pip install -r requirements.txt
+    # One worker on purpose: the inbox checker, auto-sender and retention job
+    # run inside the app, and more workers would run them more than once.
+    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 120
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /var/data     # database and screenshots live here
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: EMAIL_ADDRESS
+        value: check@scamwatcherpacific.com
+      - key: EMAIL_PASSWORD      # app password for the mailbox
+        sync: false
+      - key: RETENTION_DAYS      # must match "Deleted after [X] days" on the site
+        sync: false
+      # Where the form sends people back to. Starts as the website service
+      # below; change it to https://scamwatcherpacific.com once the domain
+      # points at the website.
+      - key: SITE_URL
+        fromService:
+          type: web
+          name: scamwatcherpacific-site
+          property: host
+      - key: DB_PATH
+        value: /var/data/scamwatcherpacific.db
+      - key: AUTO_SEND_ENABLED
+        value: "false"
+      - key: INBOX_WORKER_ENABLED
+        value: "true"
+      - key: AUDIT_BCC_EMAIL
+        value: ""
+
+  # The public website (site/index.html). Its form is pointed at the
+  # dashboard's address automatically when it builds.
+  - type: web
+    name: scamwatcherpacific-site
+    runtime: static
+    buildCommand: sed -i "s#https://YOUR-DASHBOARD-URL#https://${DASHBOARD_HOST}#" site/index.html
+    staticPublishPath: ./site
+    autoDeploy: true
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    envVars:
+      - key: DASHBOARD_HOST
+        fromService:
+          type: web
+          name: scamwatcherpacific-dashboard
+          property: host

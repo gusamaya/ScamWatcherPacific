@@ -46,12 +46,14 @@ Until `RETENTION_DAYS` is set, nothing is deleted automatically and the logs say
 
 1. **Mailbox.** Create `check@scamwatcherpacific.com` (Google Workspace is simplest), turn on 2-step verification and create an app password.
 2. **Email authentication.** In your domain's DNS, set up SPF, DKIM and DMARC for `scamwatcherpacific.com`. Replies then land in inboxes rather than spam, and scammers find it harder to send emails as you.
-3. **Deploy the dashboard** (e.g. a new Render web service from this repo):
-   - Build: `pip install -r requirements.txt`
-   - Start: `gunicorn app:app`
-   - Attach a persistent disk at `/var/data` (database and screenshots live there).
-   - Set the environment variables from `.env.example`. At minimum: `ADMIN_PASSWORD`, `SECRET_KEY`, `EMAIL_ADDRESS`, `EMAIL_PASSWORD`, `SITE_URL` and `RETENTION_DAYS`.
-4. **Point the website at it.** In `site/index.html`, replace `YOUR-DASHBOARD-URL` in the form's `action` with the dashboard's address, then deploy `site/index.html` as a static site.
+3. **Deploy on Render with the Blueprint** (`render.yaml`):
+   - In Render choose **New > Blueprint** and pick this repository.
+   - Render creates two services in Singapore: `scamwatcherpacific-dashboard` (Starter plan, with a 1 GB disk at `/var/data`) and `scamwatcherpacific-site` (the website, free static hosting).
+   - It asks for three values: `ADMIN_PASSWORD`, `EMAIL_PASSWORD` (the mailbox app password) and `RETENTION_DAYS`. `SECRET_KEY` is generated for you.
+   - The website's form is pointed at the dashboard automatically when the site builds, and `SITE_URL` starts as the site's Render address.
+4. **Custom domains.** Add `scamwatcherpacific.com` to the site service, then change the dashboard's `SITE_URL` to `https://scamwatcherpacific.com`. Optionally give the dashboard its own address (for example `review.scamwatcherpacific.com`). If you do, redeploy the site so its form uses the new address, or set `DASHBOARD_HOST` on the site to it.
+
+   Not using Render? Build with `pip install -r requirements.txt`, start with `gunicorn app:app --workers 1 --threads 4`, keep a persistent disk at `/var/data`, and replace `YOUR-DASHBOARD-URL` in `site/index.html` yourself. Keep it to **one worker**: the inbox checker runs inside the app.
 5. **Fill the site placeholders** (response time, retention days, reporting contacts and so on). The response time also appears in the form's confirmation message.
 
 ## Running locally

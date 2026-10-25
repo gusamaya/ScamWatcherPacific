@@ -38,7 +38,10 @@ BRAND_TAGLINE = os.getenv("BRAND_TAGLINE", "Independent scam checking for Pacifi
 ADVISOR_NAME = os.getenv("ADVISOR_NAME", "The ScamWatcher Pacific team")
 ADVISOR_TITLE = os.getenv("ADVISOR_TITLE", "")
 REFERENCE_PREFIX = os.getenv("REFERENCE_PREFIX", "SWP")
-SITE_URL = os.getenv("SITE_URL", "https://scamwatcherpacific.com").rstrip("/")
+SITE_URL = os.getenv("SITE_URL", "https://scamwatcherpacific.com").strip().rstrip("/")
+if SITE_URL and not SITE_URL.startswith(("http://", "https://")):
+    # Render's service references give a bare host name.
+    SITE_URL = "https://" + SITE_URL
 # Off unless set: a copy of every reply goes to this address. Leave empty to keep
 # submissions visible only to the review team, as the website promises.
 AUDIT_BCC_EMAIL = os.getenv("AUDIT_BCC_EMAIL", "").strip()
