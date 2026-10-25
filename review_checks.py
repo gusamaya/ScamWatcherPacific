@@ -969,6 +969,79 @@ SCAM_PATTERNS = [
     },
 ]
 
+# ----------------------------------------------------------------------
+# Pacific campaigns: the six scam types described on scamwatcherpacific.com.
+# The advice lines mirror the website's guidance.
+# ----------------------------------------------------------------------
+SCAM_PATTERNS += [
+    {
+        "name": "Fake overseas job offer",
+        "category": "Work",
+        "all_of": [
+            [r"\bseasonal (work|job|worker)", r"\bfarm (work|job)", r"\bfruit pick", r"\bpalm scheme\b", r"\brse\b", r"\brecognised seasonal employer",
+             r"\bwork (in|visa for) (australia|new zealand|nz|canada)\b", r"\bjob offer\b", r"\bjobs? (in|available in) (australia|new zealand|nz)\b", r"\bpacific australia labour mobility\b"],
+            [r"\b(visa|placement|processing|registration|application|medical|training) (fee|payment|cost|charge)", r"\bpay\b.{0,30}\b(fee|deposit)\b",
+             r"\bsend\b.{0,30}\b(money|payment|fee)\b", r"\bdeposit\b", r"\bsecure your (place|spot|position)\b"],
+        ],
+        "official_brands": [],
+        "advice": "Real recruitment schemes don't charge you to apply. Check any job offer with your government's labour mobility office before paying anything.",
+    },
+    {
+        "name": "Family money request from a new number or hacked account",
+        "category": "Family",
+        "all_of": [
+            [r"\bnew (number|phone)\b", r"\bchanged? (my )?number\b", r"\blost my phone\b", r"\bphone (broke|is broken)\b", r"\bhi (mum|mom|dad|aunty|uncle|cuz)\b",
+             r"\bit'?s me\b", r"\bthis is my new\b"],
+            [r"\bsend\b.{0,20}\b(money|cash|\$|funds)\b", r"\btransfer\b", r"\burgent(ly)?\b", r"\bpay (a|this) bill\b", r"\bneed (some )?money\b", r"\bpay you back\b"],
+        ],
+        "official_brands": [],
+        "advice": "Call them on their usual number first. Don't send money until you have spoken to them.",
+    },
+    {
+        "name": "Remittance or money transfer on hold",
+        "category": "Money transfer",
+        "all_of": [
+            [r"\bremittance\b", r"\bmoney transfer\b", r"\btransfer\b", r"\bwestern union\b", r"\bmoneygram\b", r"\bwire\b", r"\bfunds\b"],
+            [r"\bon hold\b", r"\bpending\b.{0,30}\b(release|clearance)\b", r"\b(release|clearance|unlock(ing)?|activation) fee\b", r"\bpay\b.{0,30}\bto release\b",
+             r"\bconfirm your (details|identity|account)\b", r"\bfunds? (have been|are) (held|frozen|suspended)\b"],
+        ],
+        "official_brands": [],
+        "advice": "Check directly with the transfer company using their official contact details, not the ones in the message.",
+    },
+    {
+        "name": "Prize or mobile money scam",
+        "category": "Mobile",
+        "all_of": [
+            [r"\byou('ve| have) won\b", r"\bwinner\b", r"\bprize\b", r"\bpromotion\b", r"\blucky draw\b", r"\bmobile money\b", r"\be-?wallet\b", r"\bairtime\b", r"\btop[- ]?up\b"],
+            [r"\bsend\b.{0,30}\b(credit|airtime|code|pin|fee)\b", r"\b(share|send|tell us|forward)\b.{0,30}\b(code|otp|pin)\b", r"\bverification code\b",
+             r"\b(processing|collection|delivery|claim) fee\b", r"\bto claim\b"],
+        ],
+        "official_brands": [],
+        "advice": "Never share a code sent to your phone. Phone companies and banks don't ask you to pay to collect a prize.",
+    },
+    {
+        "name": "Investment or \"double your money\" scheme",
+        "category": "Investment",
+        "all_of": [
+            [r"\bdouble your money\b", r"\binvest(ment|ing)?\b", r"\bcrypto\b", r"\bbitcoin\b", r"\bforex\b", r"\btrading\b", r"\bsavings group\b", r"\bscheme\b"],
+            [r"\bguaranteed\b", r"\b\d{2,4} ?% (return|profit|interest)", r"\b(daily|weekly) (profit|returns?)\b", r"\bdouble\b", r"\brecruit\b", r"\binvite (friends|others|members)\b",
+             r"\bno risk\b", r"\brisk[- ]free\b"],
+        ],
+        "official_brands": [],
+        "advice": "If you must recruit others to earn, walk away. Big, fast, guaranteed returns are a warning sign.",
+    },
+    {
+        "name": "Online romance scam",
+        "category": "Relationships",
+        "all_of": [
+            [r"\bmy (love|darling|dear|sweetheart|honey)\b", r"\bi love you\b", r"\bsoul ?mate\b", r"\bmet (you )?online\b", r"\bcan'?t (video )?call\b", r"\bdeployed\b", r"\boil rig\b"],
+            [r"\bsend\b.{0,30}\b(money|funds|\$)\b", r"\bcustoms (fee|charge)\b", r"\b(plane|flight|travel) ticket\b", r"\bhospital (bill|fee)\b", r"\bemergency\b", r"\bgift card\b"],
+        ],
+        "official_brands": [],
+        "advice": "Don't send money to someone you haven't met in person. Send us the messages to check first.",
+    },
+]
+
 
 def check_known_scams(subject, body, attachment_text="", sender_check=None, links_check=None, sender_domain="", link_domains=None):
     text = re.sub(r"\s+", " ", _lower(f"{subject}\n{body}\n{attachment_text}"))
@@ -993,7 +1066,7 @@ def check_known_scams(subject, body, attachment_text="", sender_check=None, link
         return {
             "key": "known_scams", "title": "Known scam patterns", "status": "pass",
             "headline": "Does not match any known scam campaign in our library.",
-            "details": [f"Compared against {len(SCAM_PATTERNS)} common scam types targeting Australians."],
+            "details": [f"Compared against {len(SCAM_PATTERNS)} common scam types seen in the Pacific and Australia."],
             "scam_type": "", "scam_category": "", "advice": "",
         }
 
@@ -1024,7 +1097,11 @@ def check_known_scams(subject, body, attachment_text="", sender_check=None, link
         if best["official_brands"] and not any(is_official(d, b) for b in best["official_brands"])
         and registrable_domain(d) not in TRACKING_DOMAINS
     ]
-    always_scam = best["category"] in ("Business email compromise", "Advance fee", "Extortion", "Investment", "Employment", "Impersonation")
+    always_scam = best["category"] in (
+        "Business email compromise", "Advance fee", "Extortion", "Investment", "Employment", "Impersonation",
+        # Pacific campaigns: asking for a fee or code in these contexts is never genuine.
+        "Work", "Money transfer", "Mobile", "Relationships",
+    )
 
     if official_hit:
         status = "caution"

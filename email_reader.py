@@ -717,4 +717,99 @@ def mark_email_as_read(imap_uid: str) -> bool:
         mail.logout()
 
 
-fetch_unread_emails = get_unread_emails
+
+# ----------------------------------------------------------------------
+# Deleting mail (retention and delete-on-request)
+# ----------------------------------------------------------------------
+# Gmail treats a plain IMAP delete as "archive", so the message would stay in
+# All Mail. Applying the \\Trash label moves it to Bin, which Gmail empties
+# after 30 days. Other servers get a normal delete and expunge.
+
+IS_GMAIL = "gmail" in IMAP_SERVER.lower() or "google" in IMAP_SERVER.lower()
+_default_extra = "[Gmail]/Sent Mail" if IS_GMAIL else ""
+# Replies we send are saved in Sent, and they quote what people sent us, so
+# retention clears that folder too. Comma-separated; set to "" to skip.
+RETENTION_EXTRA_FOLDERS = [
+    f.strip() for f in os.getenv("RETENTION_EXTRA_FOLDERS", _default_extra).split(",") if f.strip()
+]
+
+
+def _quote_folder(name: str) -> str:
+    return '"' + name.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _trash_uids(mail, uids) -> int:
+    count = 0
+    for uid in uids:
+        if IS_GMAIL:
+            try:
+                mail.uid("STORE", uid, "+X-GM-LABELS", "\\Trash")
+            except Exception:
+                pass
+        status, _ = mail.uid("STORE", uid, "+FLAGS", "(\\Deleted)")
+        if status == "OK":
+            count += 1
+    if uids:
+        mail.expunge()
+    return count
+
+
+def delete_messages_by_id(message_ids) -> int:
+    """Delete specific emails (by Message-ID) from the inbox. Used when someone
+    asks us to delete what they sent."""
+    message_ids = [m.strip() for m in (message_ids or []) if m and m.strip()]
+    if not message_ids:
+        return 0
+
+    mail = connect_imap()
+    try:
+        status, _ = mail.select(IMAP_FOLDER)
+        if status != "OK":
+            return 0
+        uids = []
+        for message_id in message_ids:
+            safe_id = message_id.replace('"', "")
+            status, data = mail.uid("search", None, f'(HEADER Message-ID "{safe_id}")')
+            if status == "OK" and data and data[0]:
+                uids.extend(data[0].split())
+        return _trash_uids(mail, uids)
+    finally:
+        try:
+            mail.close()
+        except Exception:
+            pass
+        mail.logout()
+
+
+def delete_messages_older_than(days: int) -> int:
+    """Delete inbox (and Sent) emails older than `days`. Returns how many."""
+    if not days or days <= 0:
+        return 0
+
+    from datetime import datetime, timedelta
+
+    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%d-%b-%Y")
+    total = 0
+    mail = connect_imap()
+    try:
+        for folder in [IMAP_FOLDER] + RETENTION_EXTRA_FOLDERS:
+            try:
+                status, _ = mail.select(_quote_folder(folder) if folder != IMAP_FOLDER else folder)
+                if status != "OK":
+                    print(f"[Retention] Could not open folder {folder}", flush=True)
+                    continue
+                status, data = mail.uid("search", None, "BEFORE", cutoff)
+                if status != "OK" or not data or not data[0]:
+                    continue
+                total += _trash_uids(mail, data[0].split())
+            except Exception as exc:
+                print(f"[Retention] Folder {folder}: {exc}", flush=True)
+        return total
+    finally:
+        try:
+            mail.close()
+        except Exception:
+            pass
+        mail.logout()
+
+fetch_unread_emails = get_unread_emails

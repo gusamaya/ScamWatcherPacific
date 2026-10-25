@@ -1,1 +1,77 @@
-# ScamWatcherPacific
+# ScamWatcher Pacific
+
+The review dashboard, inbox worker and website for **ScamWatcher Pacific**, an independent scam-checking service for Pacific communities and Pacific families abroad.
+
+It is a separate copy of the ScamWatcher (Australia) MVP, with its own mailbox, database and dashboard, so Pacific submissions never mix with Australian ones.
+
+## What's in here
+
+| Part | What it does |
+|---|---|
+| `site/index.html` | The public website. Self-contained, deploy it as a static page. Its "Get it checked" form posts to the dashboard's `/intake`. |
+| `app.py` | The review dashboard (Flask). Also receives the website form at `/intake`. |
+| `inbox_worker.py` + `email_reader.py` | Checks `check@scamwatcherpacific.com` every 30 seconds, runs the automatic review and files each email in the dashboard. |
+| `analyzer.py`, `review_checks.py`, `scoring_model.py`, `trust_lists.py` | The rule-based review engine. Pacific scam patterns are at the end of `SCAM_PATTERNS` in `review_checks.py`. |
+| `uploads.py` | Stores screenshots (from the form and from emails) with random file names. |
+
+## How a submission flows
+
+**By email** to `check@scamwatcherpacific.com`
+1. The inbox worker picks it up and runs the four automatic checks (sender, content, links, known scams).
+2. If it contains a **screenshot or photo** (an image over 30 KB), the image is saved and the submission goes to **Needs manual review**, because the checks can't read images.
+3. Otherwise a reply is drafted and waits in **Needs approval**.
+
+**By the website form**
+1. `/intake` validates the email address, checks the screenshot really is an image (PNG, JPG, GIF, WebP or HEIC, up to 10 MB), and rate-limits each connection.
+2. The submission always goes to **Needs manual review**. No automatic reply is sent to the address typed into the form.
+3. The person is sent back to the website with a confirmation message.
+
+**Replying to a manual submission**
+Open it, look at the screenshot, choose an assessment, write what they should do and what you noticed, then **Save reply**. Check the preview and **Approve and send**. The reply comes from `check@scamwatcherpacific.com`.
+
+Screenshot submissions are **never auto-sent**, even if `AUTO_SEND_ENABLED=true`.
+
+## Privacy, retention and deletion
+
+The website promises submissions are only used to review and reply, seen only by the review team, never sold or shared, deleted after a set number of days, and deleted sooner on request. The app supports this as follows:
+
+- **Retention:** set `RETENTION_DAYS` to the number on the website. Every hour the app deletes older submissions, their screenshots, and the matching emails in the inbox **and Sent** folders. On Gmail these go to Bin, which Gmail empties after 30 days.
+- **Delete on request:** every submission has a **Delete permanently** button. It removes the record, its screenshots and the inbox email.
+- **No copies outside the team:** `AUDIT_BCC_EMAIL` is empty by default. The Australian version BCCs an audit address; this one doesn't unless you set it.
+- **Screenshots** are only served to signed-in reviewers.
+
+Until `RETENTION_DAYS` is set, nothing is deleted automatically and the logs say so.
+
+## Setting it up
+
+1. **Mailbox.** Create `check@scamwatcherpacific.com` (Google Workspace is simplest), turn on 2-step verification and create an app password.
+2. **Email authentication.** In your domain's DNS, set up SPF, DKIM and DMARC for `scamwatcherpacific.com`. Replies then land in inboxes rather than spam, and scammers find it harder to send emails as you.
+3. **Deploy the dashboard** (e.g. a new Render web service from this repo):
+   - Build: `pip install -r requirements.txt`
+   - Start: `gunicorn app:app`
+   - Attach a persistent disk at `/var/data` (database and screenshots live there).
+   - Set the environment variables from `.env.example`. At minimum: `ADMIN_PASSWORD`, `SECRET_KEY`, `EMAIL_ADDRESS`, `EMAIL_PASSWORD`, `SITE_URL` and `RETENTION_DAYS`.
+4. **Point the website at it.** In `site/index.html`, replace `YOUR-DASHBOARD-URL` in the form's `action` with the dashboard's address, then deploy `site/index.html` as a static site.
+5. **Fill the site placeholders** (response time, retention days, reporting contacts and so on). The response time also appears in the form's confirmation message.
+
+## Running locally
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env    # then fill in ADMIN_PASSWORD and SECRET_KEY
+DB_PATH=./local.db SESSION_COOKIE_SECURE=false INBOX_WORKER_ENABLED=false FLASK_DEBUG=1 python app.py
+```
+
+Open `http://127.0.0.1:5000`. To try the form locally, change the website form's action to `http://127.0.0.1:5000/intake` and set `SITE_URL` to wherever you open the page from.
+
+## Keeping it current
+
+- New scam campaigns: add to `SCAM_PATTERNS` in `review_checks.py` (Pacific ones are at the end).
+- Organisations people are impersonated as: add to `BRANDS` with their official domains.
+- Confirmed scam domains: add to `BLOCKED_DOMAINS` in `trust_lists.py`.
+
+## Important
+
+This is a validation MVP, not a production-grade detection engine. Keep a person reviewing every reply, especially anything involving screenshots.

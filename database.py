@@ -1,6 +1,7 @@
 import json
 import os
 import sqlite3
+from datetime import datetime
 
 DB_NAME = os.getenv("DB_PATH", "/var/data/scamwatcher.db")
 
@@ -43,6 +44,10 @@ def ensure_columns():
         "review_checks": "TEXT",
         "scam_type": "TEXT",
         "scam_category": "TEXT",
+        "country": "TEXT",
+        "channel": "TEXT",
+        "screenshot_files": "TEXT",
+        "created_at": "TEXT",
     }
 
     for column_name, column_type in required_columns.items():
@@ -204,6 +209,10 @@ def insert_submission(
     review_checks=None,
     scam_type=None,
     scam_category=None,
+    country=None,
+    channel=None,
+    screenshot_files=None,
+    needs_manual_review=False,
     **kwargs,
 ):
     if (not from_header) and kwargs.get("sender"):
@@ -218,7 +227,17 @@ def insert_submission(
 
     # Emails sent straight to our address (not forwarded by a person) are held:
     # the "sender" is usually the scammer, so we must never reply automatically.
-    response_status = "held" if submission_type == "direct" else "draft"
+    # Screenshots can't be read by the rule-based checks, so anything that
+    # depends on an image waits for a person to write the reply.
+    if submission_type == "direct":
+        response_status = "held"
+    elif needs_manual_review:
+        response_status = "manual"
+    else:
+        response_status = "draft"
+
+    screenshot_files_json = _normalise_list_json(screenshot_files)
+    created_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
     if isinstance(review_checks, (list, dict)):
         review_checks_json = json.dumps(review_checks)
@@ -266,9 +285,13 @@ def insert_submission(
             forward_method,
             review_checks,
             scam_type,
-            scam_category
+            scam_category,
+            country,
+            channel,
+            screenshot_files,
+            created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         message_id,
         received_at,
@@ -305,6 +328,10 @@ def insert_submission(
         review_checks_json,
         scam_type or None,
         scam_category or None,
+        country or None,
+        channel or None,
+        screenshot_files_json,
+        created_at,
     ))
 
     conn.commit()

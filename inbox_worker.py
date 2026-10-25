@@ -1,3 +1,4 @@
+import base64
 import inspect
 import json
 import sys
@@ -12,6 +13,9 @@ POLL_INTERVAL_SECONDS = 30
 # email cannot block or spam the logs forever.
 MAX_PROCESSING_ATTEMPTS = 3
 _failed_attempts = {}
+
+# Images smaller than this are treated as logos or icons, not screenshots.
+MIN_SCREENSHOT_BYTES = 30 * 1024
 
 
 def _import_module(module_name: str):
@@ -270,7 +274,43 @@ def _normalise_analysis_result(result):
     }
 
 
-def _insert_submission_flexible(insert_submission, email_record, clean):
+def _save_screenshots(email_record):
+    """Store image attachments (screenshots, photos of a phone screen) so a
+    reviewer can see them in the dashboard. Returns the stored file names."""
+    try:
+        import uploads
+    except Exception as exc:
+        _log(f"Screenshot storage unavailable: {exc}")
+        return []
+
+    stored = []
+    for attachment in email_record.get("attachments") or []:
+        content_type = (attachment.get("content_type") or "").lower()
+        name = (attachment.get("filename") or "").lower()
+        looks_like_image = content_type.startswith("image/") or name.endswith(
+            (".png", ".jpg", ".jpeg", ".gif", ".webp", ".heic")
+        )
+        if not looks_like_image or not attachment.get("content_base64"):
+            continue
+        try:
+            data = base64.b64decode(attachment["content_base64"])
+        except Exception:
+            continue
+        # Logos, icons and signature images in ordinary HTML emails are small;
+        # a phone screenshot or photo is far larger. Skip the small ones so
+        # every newsletter-style email doesn't land in manual review.
+        if len(data) < MIN_SCREENSHOT_BYTES:
+            continue
+        saved = uploads.save_image(data)
+        if saved:
+            stored.append(saved)
+        if len(stored) >= 5:
+            break
+    return stored
+
+
+def _insert_submission_flexible(insert_submission, email_record, clean, screenshot_files=None):
+    screenshot_files = screenshot_files or []
     insert_kwargs = {
         "message_id": email_record["message_id"],
         "received_at": email_record["received_at"],
@@ -300,6 +340,10 @@ def _insert_submission_flexible(insert_submission, email_record, clean):
         "review_checks": json.dumps(clean.get("review_checks", [])),
         "scam_type": clean.get("scam_type", ""),
         "scam_category": clean.get("scam_category", ""),
+        "screenshot_files": screenshot_files,
+        # The text checks can't see what is in a screenshot, so a person
+        # writes the reply for any email that includes one.
+        "needs_manual_review": bool(screenshot_files),
     }
 
     try:
@@ -499,7 +543,8 @@ def main():
                     analysis = _analyse_email(analyze_email, email_record)
                     clean = _normalise_analysis_result(analysis)
 
-                    _insert_submission_flexible(insert_submission, email_record, clean)
+                    screenshot_files = _save_screenshots(email_record)
+                    _insert_submission_flexible(insert_submission, email_record, clean, screenshot_files)
 
                     try:
                         _mark_as_read(mark_email_as_read, email_record)
@@ -513,6 +558,7 @@ def main():
                         f"type={item.get('submission_type')} | "
                         f"attachments={email_record['has_attachments']} | "
                         f"attachment_names={email_record['attachment_names']} | "
+                        f"screenshots={len(screenshot_files)} | "
                         f"{clean['risk_rating']} ({clean['risk_score']})"
                     )
 
