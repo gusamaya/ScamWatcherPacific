@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% set s = submission %}
+{% set status = (s.response_status or 'draft')|lower %}
+{% set rating = (s.risk_rating or '')|lower %}
+{% set rk = 'high' if 'high' in rating else ('attn' if ('attention' in rating or 'medium' in rating) else 'low') %}
+{% set score = s.risk_score if s.risk_score is not none else 0 %}
+{% set review_status = (s.review_status or 'unreviewed')|lower %}
+{% set tag_text = {'fail': 'Warning', 'caution': 'Caution', 'pass': 'OK', 'info': 'Info'} %}
+
+{% set attachment_signals = s.attachment_signals or {} %}
+{% set attachment_names = s.attachment_names or [] %}
+{% set has_attachments = s.has_attachments or attachment_names %}
+
+{% block title %}{{ s.subject or 'Submission' }}{% endblock %}
+
+{% block content %}
+<a class="back" href="{{ url_for('dashboard') }}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+    All submissions
+</a>
+
+<div class="detail">
+    <div>
+        <section class="panel verdict is-{{ rk }}" aria-labelledby="subject">
+            <h1 class="verdict-subject" id="subject">{{ s.subject or '(No subject)' }}</h1>
+            <dl class="meta">
+                <dt>From</dt><dd>{{ (s.from_header or 'Unknown sender')|clean_sender }}</dd>
+                <dt>Received</dt><dd><span data-utc="{{ s.received_at or '' }}">{{ s.received_at or 'Unknown' }}</span></dd>
+                {% if s.submitter_email and s.submission_type != 'direct' %}
+                    <dt>Forwarded by</dt><dd>{{ s.submitter_email }}</dd>
+                {% endif %}
+                <dt>Reference</dt><dd>SW-{{ '%05d'|format(s.id) }}</dd>
+            </dl>
+
+            <div class="verdict-result">
+                <div>
+                    <p class="verdict-rating is-{{ rk }}">{{ s.risk_rating or 'Low Risk' }}</p>
+                    {% if s.scam_type %}<p class="verdict-type">{{ s.scam_type }}</p>{% endif %}
+                    <p class="verdict-action">{{ s.recommended_action or s.human_summary or '' }}</p>
+                </div>
+                <div class="verdict-meter">
+                    <div class="risk-top">
+                        <span class="risk-score">Risk score</span>
+                        <span class="risk-label is-{{ rk }}">{{ score }} / 100</span>
+                    </div>
+                    <div class="meter" role="img" aria-label="Risk score {{ score }} out of 100"><span class="meter-fill is-{{ rk }}" style="width: {{ [[score, 2]|max, 100]|min }}%"></span></div>
+                    <div class="meter-scale" aria-hidden="true"><span>Low</span><span>Attention</span><span>High</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="checks-title">
+            <h2 class="section-title" id="checks-title">How it was checked</h2>
+            <div class="panel">
+            {% if s.review_checks %}
+                <ol class="check-list">
+                {% for c in s.review_checks %}
+                    <li class="check-row">
+                        <span class="check-num" aria-hidden="true">{{ loop.index }}</span>
+                        <div>
+                            <p class="check-name">{{ c.title }}</p>
+                            <p class="check-headline">{{ c.headline }}</p>
+                        </div>
+                        <span class="tag is-{{ c.status }}">{{ tag_text.get(c.status, c.status) }}</span>
+                        {% if c.details %}
+                            {% if c.status in ('fail', 'caution') %}
+                                <ul class="check-details">
+                                    {% for d in c.details %}<li>{{ d }}</li>{% endfor %}
+                                </ul>
+                            {% else %}
+                                <details class="check-details">
+                                    <summary>Show details</summary>
+                                    <ul>{% for d in c.details %}<li>{{ d }}</li>{% endfor %}</ul>
+                                </details>
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ol>
+            {% else %}
+                <p class="note">This email was reviewed before the four-part check was added, so only the findings below are available.</p>
+            {% endif %}
+            </div>
+        </section>
+
+        {% if s.findings %}
+        <section class="section" aria-labelledby="findings-title">
+            <h2 class="section-title" id="findings-title">Other observations</h2>
+            <div class="panel">
+                <ul class="plain-list">
+                    {% for f in s.findings %}<li>{{ f }}</li>{% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if has_attachments %}
+        <section class="section" aria-labelledby="att-title">
+            <h2 class="section-title" id="att-title">Attachments</h2>
+            <div class="panel">
+                <ul class="plain-list">
+                    <li>{% if attachment_names %}{{ attachment_names|join(', ') }}{% else %}One or more attachments were included.{% endif %}</li>
+                    {% if attachment_signals.get('updated_payment_details_present') %}<li>The attachment asks for updated or changed bank details.</li>
+                    {% elif attachment_signals.get('payment_instructions_present') %}<li>The attachment asks for a payment or transfer.</li>
+                    {% elif attachment_signals.get('sensitive_info_request_present') %}<li>The attachment asks for personal or identity information.</li>
+                    {% elif attachment_signals.get('invoice_like_document') %}<li>The attachment looks like an invoice.</li>
+                    {% elif attachment_signals.get('receipt_like_document') %}<li>The attachment looks like a receipt or remittance.</li>{% endif %}
+                    {% if attachment_signals.get('bank_details_present') and not attachment_signals.get('payment_instructions_present') %}<li>The attachment contains bank or account details.</li>{% endif %}
+                    {% if attachment_signals.get('attachment_identity_mismatch') %}<li>The business named in the attachment does not match the sender.</li>{% endif %}
+                    {% if attachment_signals.get('urgency_in_attachment') %}<li>The attachment uses urgency or pressure.</li>{% endif %}
+                    {% if attachment_signals.get('attachment_only_action_pattern') %}<li>The main request is inside the attachment rather than the email.</li>{% endif %}
+                    {% for f in attachment_signals.get('attachment_findings', []) %}<li>{{ f }}</li>{% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="section" aria-labelledby="original-title">
+            <h2 class="section-title visually-hidden" id="original-title">Original email</h2>
+            <details class="panel disclosure">
+                <summary>Original email</summary>
+                <pre class="original-body">{{ s.body or 'No email body was captured.' }}</pre>
+            </details>
+        </section>
+
+        <section class="section" aria-labelledby="preview-title">
+            <h2 class="section-title visually-hidden" id="preview-title">Reply preview</h2>
+            <details class="panel disclosure" {% if status not in ('sent', 'held') %}open{% endif %}>
+                <summary>{% if status == 'sent' %}Reply that was sent{% else %}Reply preview{% endif %}</summary>
+                <iframe class="reply-frame" title="Reply email preview" sandbox srcdoc="{{ reply_html }}"></iframe>
+            </details>
+        </section>
+    </div>
+
+    <aside class="rail" aria-label="Actions">
+        <section class="panel rail-card">
+            <h2 class="rail-title">Reply</h2>
+            <dl class="facts">
+                <dt>Status</dt>
+                <dd>
+                    {% if status == 'sent' %}<span class="status status-sent">Sent</span>
+                    {% elif status == 'sending' %}<span class="status status-sending">Sending</span>
+                    {% elif status == 'failed' %}<span class="status status-failed">Failed</span>
+                    {% elif status == 'held' %}<span class="status status-held">Not replied</span>
+                    {% else %}<span class="status status-pending">{% if auto_send_enabled %}Queued{% else %}Needs approval{% endif %}</span>{% endif %}
+                </dd>
+                <dt>{% if status == 'sent' %}Sent to{% else %}Send to{% endif %}</dt>
+                <dd>{{ s.sent_to_email or s.submitter_email or 'No address found' }}</dd>
+                {% if s.sent_at %}<dt>Sent</dt><dd><span data-utc="{{ s.sent_at }}">{{ s.sent_at }}</span></dd>{% endif %}
+                {% if s.send_attempts %}<dt>Attempts</dt><dd>{{ s.send_attempts }}</dd>{% endif %}
+            </dl>
+
+            {% if status == 'failed' and s.response_error %}
+                <p class="callout is-error">{{ s.response_error }}</p>
+            {% endif %}
+
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% if status == 'sent' %}
+                    <button class="btn" type="button" disabled>Reply sent</button>
+                {% elif status == 'sending' %}
+                    <button class="btn" type="button" disabled>Sending…</button>
+                {% elif status == 'held' %}
+                    <p class="callout">This email came straight to ScamWatcher, not from a person forwarding it. A reply would go to the original sender, who is likely the scammer.</p>
+                    <input type="hidden" name="confirm_direct" value="yes">
+                    <button class="btn btn-warn" name="action" value="approve_send"
+                            onclick="return confirm('This replies to the original sender, who may be the scammer. Send anyway?');">
+                        Send reply anyway
+                    </button>
+                {% else %}
+                    <button class="btn" name="action" value="approve_send">
+                        {% if status == 'failed' %}Try sending again{% else %}Approve and send reply{% endif %}
+                    </button>
+                    <p class="helper">Check the verdict and the reply preview first.</p>
+                {% endif %}
+            </form>
+        </section>
+
+        <section class="panel rail-card">
+            <h2 class="rail-title">Your assessment</h2>
+            <form method="POST" class="btn-stack">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-quiet" name="action" value="mark_correct" aria-pressed="{{ 'true' if review_status == 'correct' else 'false' }}">Verdict is correct</button>
+                <button class="btn btn-quiet" name="action" value="mark_review_required" aria-pressed="{{ 'true' if review_status == 'review_required' else 'false' }}">Verdict needs review</button>
+                {% if review_status != 'unreviewed' %}
+                    <button class="btn btn-quiet" name="action" value="clear_review">Clear</button>
+                {% endif %}
+            </form>
+            <p class="helper">For your records. This does not change the reply.</p>
+        </section>
+    </aside>
+</div>
+{% endblock %}

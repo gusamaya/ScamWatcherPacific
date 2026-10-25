@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% set view_titles = {
+    'pending': ('Needs approval', 'Replies drafted for people who forwarded an email. Check each verdict, then approve the reply.'),
+    'failed': ('Failed to send', 'Replies that could not be delivered. Open one to see the error and try again.'),
+    'sent': ('Sent', 'Submissions that have received a reply.'),
+    'direct': ('Sent directly', 'Emails that arrived at the check address without being forwarded by a person. The sender is usually the scammer, so no reply is sent.'),
+    'high': ('High risk', 'Submissions rated High Risk.'),
+    'attention': ('Needs attention', 'Submissions with some warning signs.'),
+    'low': ('Low risk', 'Submissions with no strong scam indicators.'),
+    'all': ('All submissions', 'Every email submitted to ScamWatcher, newest first.'),
+} %}
+{% set heading = view_titles.get(active_filter, view_titles['all']) %}
+{% if active_filter == 'pending' and auto_send_enabled %}
+    {% set heading = ('Waiting to send', 'Replies queued to send automatically.') %}
+{% endif %}
+
+{% block title %}{{ heading[0] }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1 class="page-title">{{ heading[0] }}</h1>
+        <p class="page-lede">{{ heading[1] }}</p>
+    </div>
+    {% if submissions %}
+    <label class="search">
+        <span class="visually-hidden">Search submissions</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="queue-search" placeholder="Search sender, subject or scam type" autocomplete="off">
+    </label>
+    {% endif %}
+</div>
+
+<div class="panel">
+{% if submissions %}
+    <table class="queue">
+        <thead>
+            <tr>
+                <th scope="col" class="col-received">Received</th>
+                <th scope="col" class="col-email">Email</th>
+                <th scope="col" class="col-checks">Checks</th>
+                <th scope="col" class="col-risk">Risk</th>
+                <th scope="col" class="col-reply">Reply</th>
+                <th scope="col" class="col-go"><span class="visually-hidden">Open</span></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for s in submissions %}
+            {% set status = (s.response_status or 'draft')|lower %}
+            {% set rating = (s.risk_rating or '')|lower %}
+            {% set rk = 'high' if 'high' in rating else ('attn' if ('attention' in rating or 'medium' in rating) else 'low') %}
+            {% set score = s.risk_score if s.risk_score is not none else 0 %}
+            <tr data-search="{{ ((s.subject or '') ~ ' ' ~ (s.from_header or '') ~ ' ' ~ (s.scam_type or '') ~ ' ' ~ (s.submitter_email or ''))|lower }}">
+                <td class="col-received">
+                    <span data-utc="{{ s.received_at or '' }}" data-format="split">{{ s.received_at or '—' }}</span>
+                </td>
+                <td class="col-email">
+                    <a class="email-subject" href="{{ url_for('submission_detail', submission_id=s.id) }}">{{ s.subject or '(No subject)' }}</a>
+                    <span class="email-sender">{{ (s.from_header or 'Unknown sender')|clean_sender }}</span>
+                    {% if s.scam_type %}<span class="email-type">{{ s.scam_type }}</span>{% endif %}
+                </td>
+                <td class="col-checks">
+                    {% if s.review_checks %}
+                        <div class="checks" role="img" aria-label="{% for c in s.review_checks %}{{ c.title }}: {{ {'fail':'warning','caution':'caution','pass':'OK'}.get(c.status, c.status) }}{% if not loop.last %}, {% endif %}{% endfor %}">
+                            {% for c in s.review_checks %}
+                                <span class="check-light is-{{ c.status }}" title="{{ c.title }}: {{ c.headline }}">{{ {'sender':'S','content':'C','links':'L','known_scams':'K'}.get(c.key, '?') }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <span class="checks-none">Not available</span>
+                    {% endif %}
+                </td>
+                <td class="col-risk">
+                    <div class="risk">
+                        <div class="risk-top">
+                            <span class="risk-label is-{{ rk }}">{{ s.risk_rating or 'Low Risk' }}</span>
+                            <span class="risk-score">{{ score }}</span>
+                        </div>
+                        <div class="meter" aria-hidden="true"><span class="meter-fill is-{{ rk }}" style="width: {{ [[score, 2]|max, 100]|min }}%"></span></div>
+                    </div>
+                </td>
+                <td class="col-reply">
+                    {% if status == 'sent' %}
+                        <span class="status status-sent">Sent</span>
+                        <span class="status-sub">{{ s.sent_to_email or '' }}</span>
+                    {% elif status == 'sending' %}
+                        <span class="status status-sending">Sending</span>
+                    {% elif status == 'failed' %}
+                        <span class="status status-failed">Failed</span>
+                        <span class="status-sub">{{ s.send_attempts or 0 }} attempt{% if (s.send_attempts or 0) != 1 %}s{% endif %}</span>
+                    {% elif status == 'held' %}
+                        <span class="status status-held">Not replied</span>
+                        <span class="status-sub">Sent directly</span>
+                    {% else %}
+                        <span class="status status-pending">{% if auto_send_enabled %}Queued{% else %}Needs approval{% endif %}</span>
+                    {% endif %}
+                </td>
+                <td class="col-go" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="empty" id="no-matches" hidden><strong>No matches</strong>Try a different sender, subject or scam type.</div>
+{% else %}
+    <div class="empty">
+        {% if active_filter == 'pending' %}
+            <strong>Nothing waiting for approval</strong>New forwarded emails will appear here within a minute of arriving.
+        {% elif active_filter == 'failed' %}
+            <strong>No failed replies</strong>Every reply so far has been delivered.
+        {% else %}
+            <strong>No submissions in this view</strong>Choose another view from the menu.
+        {% endif %}
+    </div>
+{% endif %}
+</div>
+
+{% if submissions %}
+<div class="legend" aria-hidden="true">
+    <span>Checks:</span>
+    <span><span class="check-light">S</span> Sender</span>
+    <span><span class="check-light">C</span> Content</span>
+    <span><span class="check-light">L</span> Links</span>
+    <span><span class="check-light">K</span> Known scams</span>
+    <span><span class="check-light is-fail">!</span> Warning</span>
+    <span><span class="check-light is-caution">?</span> Caution</span>
+    <span><span class="check-light is-pass">✓</span> OK</span>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        var input = document.getElementById("queue-search");
+        if (!input) return;
+        var rows = Array.prototype.slice.call(document.querySelectorAll(".queue tbody tr"));
+        var empty = document.getElementById("no-matches");
+        input.addEventListener("input", function () {
+            var q = input.value.trim().toLowerCase();
+            var shown = 0;
+            rows.forEach(function (row) {
+                var match = !q || row.getAttribute("data-search").indexOf(q) !== -1;
+                row.hidden = !match;
+                if (match) shown++;
+            });
+            empty.hidden = shown !== 0;
+        });
+    })();
+</script>
+{% endblock %}
