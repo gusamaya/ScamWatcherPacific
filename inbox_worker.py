@@ -14,6 +14,11 @@ POLL_INTERVAL_SECONDS = 30
 MAX_PROCESSING_ATTEMPTS = 3
 _failed_attempts = {}
 
+# Emails this process has dealt with without saving them (Google's own
+# notices, ones with no Message-ID, ones given up on), so the inbox checker
+# doesn't download them again on every check.
+_handled = set()
+
 # Images smaller than this are treated as logos or icons, not screenshots.
 MIN_SCREENSHOT_BYTES = 30 * 1024
 
@@ -511,12 +516,17 @@ def main():
 
     while True:
         try:
-            unread = fetch_unread_emails() or []
+            fetch_new = getattr(email_reader, "fetch_new_emails", None)
+            if fetch_new:
+                # Everything recent that isn't in the dashboard yet, read or not.
+                unread = fetch_new(lambda mid: mid in _handled or bool(mid and submission_exists(mid))) or []
+            else:
+                unread = fetch_unread_emails() or []
 
             if unread:
-                _log(f"Found {len(unread)} unread email(s).")
+                _log(f"Found {len(unread)} new email(s).")
             elif time.time() - last_heartbeat > 600:
-                _log("Inbox checked: no unread emails.")
+                _log("Inbox checked: no new emails.")
                 last_heartbeat = time.time()
 
             for item in unread:
@@ -529,6 +539,7 @@ def main():
 
                     if is_internal or exclude_from_calibration:
                         print(f"[{_now()}] Skipping internal/excluded email: {message_id or '(no message_id)'}")
+                        _handled.add(message_id or f"uid:{email_record['uid']}")
 
                         try:
                             _mark_as_read(mark_email_as_read, email_record)
@@ -539,6 +550,7 @@ def main():
 
                     if not message_id:
                         print(f"[{_now()}] Skipping email with no message_id.")
+                        _handled.add(f"uid:{email_record['uid']}")
                         continue
 
                     if submission_exists(message_id):
@@ -602,6 +614,7 @@ def main():
 
                     if key and attempts >= MAX_PROCESSING_ATTEMPTS:
                         print(f"[{_now()}] Giving up on {key}; marking as read. Review it manually in the inbox.")
+                        _handled.add(key)
                         try:
                             _mark_as_read(mark_email_as_read, email_record)
                         except Exception as exc:

@@ -515,7 +515,45 @@ def extract_attachments(message) -> Tuple[bool, List[str], List[Dict], str]:
     return has_attachments, deduped_names, attachments, attachment_text
 
 
-def get_unread_emails() -> List[Dict]:
+# How far back the inbox checker looks for emails it hasn't processed yet.
+INBOX_LOOKBACK_DAYS = int(os.getenv("INBOX_LOOKBACK_DAYS", "3"))
+
+
+def _message_ids_for(mail, uid_list) -> Dict[str, str]:
+    """Fetch just the Message-ID header for many emails in one request.
+    Returns {uid: message_id}."""
+    found = {}
+    if not uid_list:
+        return found
+    joined = b",".join(uid_list).decode() if isinstance(uid_list[0], bytes) else ",".join(uid_list)
+    status, data = mail.uid("fetch", joined, "(UID BODY.PEEK[HEADER.FIELDS (MESSAGE-ID)])")
+    if status != "OK" or not data:
+        return found
+    for part in data:
+        if not isinstance(part, tuple) or len(part) < 2:
+            continue
+        meta = part[0].decode(errors="replace") if isinstance(part[0], bytes) else str(part[0])
+        uid_match = re.search(r"UID (\d+)", meta)
+        if not uid_match:
+            continue
+        header = email.message_from_bytes(part[1] or b"")
+        found[uid_match.group(1)] = (header.get("Message-ID") or "").strip()
+    return found
+
+
+def fetch_new_emails(is_known) -> List[Dict]:
+    """Emails from the last few days that haven't been processed yet, read or
+    unread. `is_known(message_id)` says whether one is already handled.
+
+    Relying on "unread" alone missed emails whenever someone opened them in
+    Gmail before the checker got to them."""
+    from datetime import datetime, timedelta
+
+    since = (datetime.utcnow() - timedelta(days=INBOX_LOOKBACK_DAYS)).strftime("%d-%b-%Y")
+    return get_unread_emails(search=("SINCE", since), is_known=is_known)
+
+
+def get_unread_emails(search=("UNSEEN",), is_known=None) -> List[Dict]:
     mail = connect_imap()
 
     try:
@@ -523,11 +561,21 @@ def get_unread_emails() -> List[Dict]:
         if status != "OK":
             raise RuntimeError(f"Could not open IMAP folder: {IMAP_FOLDER}")
 
-        status, data = mail.uid("search", None, "UNSEEN")
+        status, data = mail.uid("search", None, *search)
         if status != "OK":
-            raise RuntimeError("Failed to search unread emails.")
+            raise RuntimeError("Failed to search the inbox.")
 
-        uid_list = data[0].split()
+        uid_list = data[0].split() if data and data[0] else []
+
+        if is_known is not None and uid_list:
+            # Cheap first pass: skip anything already handled before
+            # downloading the whole email.
+            ids = _message_ids_for(mail, uid_list)
+            uid_list = [
+                uid for uid in uid_list
+                if not is_known(ids.get(uid.decode(), "") or f"uid:{uid.decode()}")
+            ]
+
         emails = []
 
         for uid in uid_list:
