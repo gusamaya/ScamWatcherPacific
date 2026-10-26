@@ -177,6 +177,11 @@ def build(name, title, description, body):
     head = re.sub(r"<title>.*?</title>", f"<title>{title} | ScamWatcher Pacific</title>", head, count=1, flags=re.S)
     head = re.sub(r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{description}">', head, count=1)
     head = head.replace("</style>", EXTRA_CSS + "</style>", 1)
+    page_url = f"https://www.scamwatcherpacific.com/{name}"
+    head = head.replace('href="https://www.scamwatcherpacific.com/"', f'href="{page_url}"')
+    head = head.replace('content="https://www.scamwatcherpacific.com/"', f'content="{page_url}"')
+    head = re.sub(r'<meta property="og:title" content="[^"]*">', f'<meta property="og:title" content="{title} | ScamWatcher Pacific">', head)
+    head = re.sub(r'<meta property="og:description" content="[^"]*">', f'<meta property="og:description" content="{description}">', head)
 
     body_start = index.index("<body", head_end)
     header_end = index.index("</header>", body_start) + len("</header>")
