@@ -52,6 +52,7 @@ def ensure_columns():
         "auto_review": "TEXT",
         "auto_review_error": "TEXT",
         "verdict_note": "TEXT",
+        "brand": "TEXT",
     }
 
     for column_name, column_type in required_columns.items():
@@ -218,6 +219,7 @@ def insert_submission(
     screenshot_files=None,
     needs_manual_review=False,
     verdict_note=None,
+    brand=None,
     **kwargs,
 ):
     if (not from_header) and kwargs.get("sender"):
@@ -295,9 +297,10 @@ def insert_submission(
             channel,
             screenshot_files,
             created_at,
-            verdict_note
+            verdict_note,
+            brand
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         message_id,
         received_at,
@@ -339,6 +342,7 @@ def insert_submission(
         screenshot_files_json,
         created_at,
         verdict_note or None,
+        brand or None,
     ))
 
     conn.commit()

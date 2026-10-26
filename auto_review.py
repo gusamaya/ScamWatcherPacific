@@ -85,6 +85,7 @@ REVIEW_TOOL = {
             "readable": {"type": "boolean", "description": "False if the image can't be read or isn't a message."},
             "platform": {"type": "string", "description": "Where the message appears to come from, e.g. WhatsApp, Facebook Messenger, SMS, email, unknown."},
             "sender": {"type": "string", "description": "Sender name, number or address as shown, or empty."},
+            "organisation": {"type": "string", "description": "The company or government body the message claims to be from (e.g. Vodafone Fiji, Digicel, BSP, Westpac, Telstra, Western Union), or empty if none."},
             "transcript": {"type": "string", "description": "The visible message text, transcribed as written."},
             "english_translation": {"type": "string", "description": "English translation if any of the text isn't English, otherwise empty."},
             "links": {"type": "array", "items": {"type": "string"}, "description": "Web addresses visible in the message."},
@@ -311,6 +312,7 @@ def review_submission(submission_id, force=False):
                 review_checks = ?,
                 confidence_label = ?,
                 screenshot_text = ?,
+                brand = ?,
                 auto_review = ?,
                 auto_review_error = NULL,
                 response_status = CASE
@@ -324,7 +326,8 @@ def review_submission(submission_id, force=False):
                 rating, RATING_SCORES[rating], (result.get("scam_type") or "").strip()[:120] or None,
                 action, action, action,
                 json.dumps(observations), len(observations), json.dumps(checks),
-                meta["confidence"], read_text[:12000], json.dumps(meta), submission_id,
+                meta["confidence"], read_text[:12000], (result.get("organisation") or "").strip()[:80] or None,
+                json.dumps(meta), submission_id,
             ),
         )
         conn.commit()

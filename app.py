@@ -19,6 +19,7 @@ load_dotenv()
 
 import auto_review
 import database
+import reply_advice
 import uploads
 
 # Write log lines immediately. Without this, output from background threads can
@@ -379,6 +380,7 @@ def ensure_schema():
         "auto_review": "TEXT",
         "auto_review_error": "TEXT",
         "verdict_note": "TEXT",
+        "brand": "TEXT",
     }
 
     for column_name, column_type in required_columns.items():
@@ -649,7 +651,7 @@ def build_html_email(submission):
         genuine_box = f"""
             <div style="background:#E7F6EE; border:1px solid #B4E2C8; border-radius:10px; padding:12px 14px; margin:0 0 18px 0; color:#065F3B; font-size:14px; line-height:1.6;">
                 <strong>{html_escape(submission.get("verdict_note"))}</strong>
-                That still doesn't make the links or phone number in it safe to use, so follow the advice below.
+                That still doesn't make the links or phone number in it safe to use, so follow the advice above.
             </div>
         """
 
@@ -709,22 +711,23 @@ def build_html_email(submission):
             <div style="margin-bottom:10px;">Hello,</div>
 
             <div style="margin-bottom:18px;">
-                Thank you for sending us this message to check. Here is what we found and what we suggest you do next.
+                Thank you for sending us this message to check. Here is our advice.
             </div>
 
-            <div style="font-size:13px; color:#46606D; margin-bottom:18px;">
-                Reference: <strong>{html_escape(reference_code)}</strong>
+            {reply_advice.html_box(submission, money_contact="your bank or mobile money provider")}
+
+            <div style="font-size:16px; font-weight:700; color:#0B2A3A; margin:0 0 12px 0; padding-top:4px; border-top:1px solid #D3E0E2;">
+                <div style="padding-top:16px;">Why we think this</div>
             </div>
 
-            <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:4px;">Our assessment:</div>
-            <div style="font-size:14px; font-weight:700; color:{risk_color}; margin-bottom:14px;">{html_escape(risk)}.</div>
+            <div style="font-size:13px; color:#46606D; margin-bottom:14px;">
+                Reference: <strong>{html_escape(reference_code)}</strong> &middot;
+                Our assessment: <strong style="color:{risk_color};">{html_escape(risk)}</strong>
+            </div>
 
             {scam_type_box}
 
             {genuine_box}
-
-            <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:4px;">What to do:</div>
-            <div style="font-size:14px; font-weight:700; color:#0B6E6E; margin-bottom:28px;">{html_escape(action)}</div>
 
             {checks_box}
 
@@ -736,14 +739,6 @@ def build_html_email(submission):
             {attachment_box}
 
             {tip_box}
-
-            <div style="line-height:1.7; font-weight:700; color:#0B2A3A; margin-bottom:12px;">{html_escape(guidance_strong)}</div>
-            <div style="line-height:1.7; margin-bottom:22px;">{html_escape(guidance)}</div>
-
-            <div style="background:#F6EBDD; border:1px solid #EAD7BF; border-radius:10px; padding:12px 14px; margin:0 0 28px 0; font-size:13px; line-height:1.6; color:#22404D;">
-                <strong style="color:#8A3B12;">Already paid, clicked or shared details?</strong>
-                Call your bank or mobile money provider straight away, change your passwords, and warn family and friends if your account was taken over.
-            </div>
 
             <div style="margin-bottom:6px;">Kind regards,</div>
             <div style="font-weight:700; color:#0B2A3A;">{html_escape(ADVISOR_NAME)}</div>
@@ -771,22 +766,23 @@ def build_plain_text_email(submission):
     lines = [
         "Hello,",
         "",
-        "Thank you for sending us this message to check.",
+        "Thank you for sending us this message to check. Here is our advice.",
         "",
+    ]
+    lines += reply_advice.text_block(submission, money_contact="your bank or mobile money provider")
+    lines += [
+        "",
+        "WHY WE THINK THIS",
         f"Reference: {reference_code}",
         f"Our assessment: {submission.get('risk_rating') or 'Needs Attention'}",
     ]
     if submission.get("scam_type"):
         lines.append(f"Likely scam type: {submission.get('scam_type')}")
     if submission.get("verdict_note"):
-        lines += ["", submission.get("verdict_note")]
-    if submission.get("recommended_action"):
-        lines += ["", "What to do:", submission.get("recommended_action")]
+        lines.append(submission.get("verdict_note"))
     if findings:
         lines += ["", "What we noticed:"] + [f"- {f}" for f in findings[:5]]
     lines += [
-        "",
-        "Already paid, clicked or shared details? Call your bank or mobile money provider straight away and change your passwords.",
         "",
         "Kind regards,",
         ADVISOR_NAME,
