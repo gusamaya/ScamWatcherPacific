@@ -214,7 +214,9 @@ def normalize_findings(value):
     for item in raw_findings:
         parts = split_combined_finding_text(item)
         for part in parts:
-            if part:
+            # Single characters come from a string that was split letter by
+            # letter (an older automatic-review bug); they are never findings.
+            if part and len(part.strip()) > 1:
                 cleaned_findings.append(part)
 
     seen = set()

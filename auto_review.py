@@ -17,6 +17,7 @@ import base64
 import io
 import json
 import os
+import re
 import sqlite3
 import threading
 import urllib.error
@@ -186,6 +187,44 @@ def call_claude(images, country="", channel="", notes=""):
     raise RuntimeError("Claude did not return a review in the expected format.")
 
 
+# Tag fragments Claude occasionally leaves in a field, such as
+# '<parameter name="observations">' or '</parameter>'.
+_TAG_RE = re.compile(r"</?\s*(parameter|invoke|function_calls)\b[^>]*>", re.I)
+
+
+def _clean_text(value):
+    if value is None:
+        return ""
+    if not isinstance(value, str):
+        value = str(value)
+    return _TAG_RE.sub("", value).strip()
+
+
+def _as_list(value):
+    """Return a list of strings, whatever shape the field came back in.
+
+    The tool asks for an array, but the reply sometimes holds one string
+    instead (a JSON array as text, or one item per line). Looping over a
+    plain string would give one letter per item."""
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple)):
+        items = list(value)
+    else:
+        text = _clean_text(value)
+        try:
+            parsed = json.loads(text)
+            items = parsed if isinstance(parsed, list) else [text]
+        except ValueError:
+            items = text.splitlines()
+    out = []
+    for item in items:
+        item = _clean_text(item).strip(" -*•\t\"'")
+        if len(item) > 1:
+            out.append(item)
+    return out
+
+
 def _json_from_text(text):
     """Pull the first JSON object out of a text reply, or return None."""
     start = text.find("{")
@@ -222,7 +261,7 @@ def _rule_checks(result, notes=""):
             result.get("english_translation", ""),
             notes,
         ]))
-        links = [{"text": "", "url": u} for u in (result.get("links") or []) if isinstance(u, str)]
+        links = [{"text": "", "url": u} for u in _as_list(result.get("links"))]
         review = review_checks.run_review(
             from_header="",
             subject="",
@@ -236,7 +275,7 @@ def _rule_checks(result, notes=""):
 
         # Don't tell people "no known scam" when Claude recognised one that
         # the pattern library doesn't cover yet.
-        scam_type = (result.get("scam_type") or "").strip()
+        scam_type = _clean_text(result.get("scam_type"))
         rating = result.get("risk_rating") or ""
         if scam_type and rating in ("High Risk", "Needs Attention"):
             for i, check in enumerate(checks):
@@ -301,16 +340,16 @@ def review_submission(submission_id, force=False):
         result = call_claude(images, row.get("country") or "", row.get("channel") or "", notes or "")
 
         rating = result.get("risk_rating") if result.get("risk_rating") in RATING_SCORES else "Needs Attention"
-        observations = [str(o).strip()[:300] for o in (result.get("observations") or []) if str(o).strip()][:8]
-        action = (result.get("recommended_action") or "").strip()[:1500] or \
+        observations = [o[:300] for o in _as_list(result.get("observations"))][:8]
+        action = _clean_text(result.get("recommended_action"))[:1500] or \
             "Don't act on this message until you have checked it through an official contact you already trust."
-        transcript = (result.get("transcript") or "").strip()
-        translation = (result.get("english_translation") or "").strip()
+        transcript = _clean_text(result.get("transcript"))
+        translation = _clean_text(result.get("english_translation"))
         read_text = transcript + (f"\n\nEnglish translation:\n{translation}" if translation else "")
         meta = {
             "platform": result.get("platform") or "",
             "sender": result.get("sender") or "",
-            "links": [u for u in (result.get("links") or []) if isinstance(u, str)][:10],
+            "links": _as_list(result.get("links"))[:10],
             "confidence": result.get("confidence") or "",
             "readable": bool(result.get("readable", True)),
             "model": CLAUDE_MODEL,
@@ -344,10 +383,10 @@ def review_submission(submission_id, force=False):
               AND LOWER(COALESCE(response_status, 'draft')) NOT IN ('sent', 'sending')
             """,
             (
-                rating, RATING_SCORES[rating], (result.get("scam_type") or "").strip()[:120] or None,
+                rating, RATING_SCORES[rating], _clean_text(result.get("scam_type"))[:120] or None,
                 action, action, action,
                 json.dumps(observations), len(observations), json.dumps(checks),
-                meta["confidence"], read_text[:12000], (result.get("organisation") or "").strip()[:80] or None,
+                meta["confidence"], read_text[:12000], _clean_text(result.get("organisation"))[:80] or None,
                 json.dumps(meta), submission_id,
             ),
         )
