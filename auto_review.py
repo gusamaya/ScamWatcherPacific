@@ -232,7 +232,27 @@ def _rule_checks(result, notes=""):
         )
         # The sender check is built for email headers and has nothing to work
         # with for a chat screenshot, so it is left out.
-        return [c for c in review.get("checks", []) if c.get("key") != "sender"]
+        checks = [c for c in review.get("checks", []) if c.get("key") != "sender"]
+
+        # Don't tell people "no known scam" when Claude recognised one that
+        # the pattern library doesn't cover yet.
+        scam_type = (result.get("scam_type") or "").strip()
+        rating = result.get("risk_rating") or ""
+        if scam_type and rating in ("High Risk", "Needs Attention"):
+            for i, check in enumerate(checks):
+                if check.get("key") == "known_scams" and check.get("status") == "pass":
+                    checks[i] = {
+                        "key": "known_scams", "title": "Known scam patterns",
+                        "status": "fail" if rating == "High Risk" else "caution",
+                        "headline": f"Recognised as a known type of scam: {scam_type}.",
+                        "details": [
+                            "Identified by the automatic review of the screenshot. "
+                            "Our keyword library didn't match the wording, so a reviewer should confirm it.",
+                        ],
+                        "scam_type": scam_type, "possible_scam_type": scam_type,
+                        "scam_category": "", "advice": "",
+                    }
+        return checks
     except Exception as exc:
         _log(f"Rule checks skipped: {exc}")
         return []

@@ -1090,6 +1090,43 @@ SCAM_PATTERNS += [
         "official_brands": [],
         "advice": "Don't send money to someone you haven't met in person. Send us the messages to check first.",
     },
+    # --- Social media account takeovers (Facebook, Instagram, WhatsApp) ---
+    {
+        "name": "Fake Meta policy violation or page takeover",
+        "category": "Social media",
+        "all_of": [
+            [r"\bmeta\b", r"\bfacebook\b", r"\binstagram\b", r"\bbusiness (support|suite|manager|centre|center)\b",
+             r"\bfan ?page\b", r"\bcommunity standards\b"],
+            [r"\bviolat", r"\bcopyright\b", r"\binfring", r"\bintellectual property\b", r"\bcommunity standards\b",
+             r"\b(page|account) (has been |will be |is )?(restricted|suspended|disabled|deactivated|deleted|removed|locked|unpublished)\b",
+             r"\b(permanent(ly)?|scheduled for) (delet|deactivat|disabl|remov)", r"\bappeal\b", r"\breported\b.{0,40}\b(page|account|post)\b",
+             r"\bpolicy (breach|violation|warning)\b", r"\bfinal (warning|notice)\b"],
+        ],
+        "official_brands": ["Facebook", "Instagram"],
+        "advice": "Meta does not send warnings about your page by Messenger, chat or a PDF. Check your page in the Facebook app under Account Status or Support Inbox, and never enter your password through a link or file.",
+    },
+    {
+        "name": "Fake Meta verification or blue tick offer",
+        "category": "Social media",
+        "all_of": [
+            [r"\bmeta\b", r"\bfacebook\b", r"\binstagram\b"],
+            [r"\bblue (tick|badge|check)\b", r"\bverified badge\b", r"\bmeta verified\b", r"\bget (your page |your account )?verified\b",
+             r"\bverification (request|badge|form|process)\b", r"\beligible for verification\b"],
+        ],
+        "official_brands": ["Facebook", "Instagram"],
+        "advice": "Meta Verified is only applied for inside the Facebook or Instagram app itself. Ignore messages offering a blue tick and don't enter your login details.",
+    },
+    {
+        "name": "Verification code theft (WhatsApp, Facebook or SMS code)",
+        "category": "Social media",
+        "all_of": [
+            [r"\b(\d-digit |6 digit |six digit |verification |security |login |whatsapp )code\b", r"\bcode (i|we) (just )?sent\b", r"\bsent (you )?a code\b"],
+            [r"\b(send|forward|share|give|tell) (me|us)?\s?(the|that|this|your)? ?code\b", r"\bsent (to you|to your phone) by (mistake|accident)\b",
+             r"\bby mistake\b", r"\bwrong number\b", r"\bplease send\b"],
+        ],
+        "official_brands": [],
+        "advice": "Never share a code sent to your phone, even with a friend or family member. Anyone asking for it is trying to take over your account. If you already shared it, turn on two-step verification and contact the app's support from inside the app.",
+    },
 ]
 
 
@@ -1151,6 +1188,9 @@ def check_known_scams(subject, body, attachment_text="", sender_check=None, link
         "Business email compromise", "Advance fee", "Extortion", "Investment", "Employment", "Impersonation",
         # Pacific campaigns: asking for a fee or code in these contexts is never genuine.
         "Work", "Money transfer", "Mobile", "Relationships",
+        # A page warning or code request sent by chat is never Meta itself;
+        # a real notice from Meta's own address still lands on "caution" above.
+        "Social media",
     )
 
     if official_hit:
