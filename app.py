@@ -82,7 +82,9 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 
 app = Flask(__name__)
 # Hard cap on any request body (the web form's screenshot plus its fields).
-app.config["MAX_CONTENT_LENGTH"] = (MAX_UPLOAD_MB + 1) * 1024 * 1024
+# Up to MAX_SCREENSHOTS images per website submission, each up to MAX_UPLOAD_MB.
+MAX_SCREENSHOTS = int(os.getenv("MAX_SCREENSHOTS", "5"))
+app.config["MAX_CONTENT_LENGTH"] = (MAX_SCREENSHOTS * MAX_UPLOAD_MB + 1) * 1024 * 1024
 
 _secret_key = os.getenv("SECRET_KEY", "").strip()
 if not _secret_key:
@@ -1603,13 +1605,20 @@ def intake():
         channel = "Other"
     notes = (request.form.get("notes") or "").strip()[:4000]
 
-    stored = None
-    upload = request.files.get("screenshot")
-    if upload and upload.filename:
+    chosen = [f for f in request.files.getlist("screenshot") if f and f.filename]
+    if len(chosen) > MAX_SCREENSHOTS:
+        return _back_to_site("toomany")
+
+    stored_files = []
+    for upload in chosen:
         data = upload.read(MAX_UPLOAD_MB * 1024 * 1024 + 1)
-        stored = uploads.save_image(data)
-        if not stored:
+        saved_name = uploads.save_image(data)
+        if not saved_name:
+            # Don't keep half a submission: remove any already saved.
+            uploads.delete_files(stored_files)
             return _back_to_site("file")
+        stored_files.append(saved_name)
+    stored = bool(stored_files)
 
     if not stored and not notes:
         return _back_to_site("empty")
@@ -1633,13 +1642,16 @@ def intake():
         submitter_email=email_address,
         submitter_from_header=email_address,
         has_attachments=1 if stored else 0,
-        attachment_names=["Screenshot"] if stored else [],
+        attachment_names=(
+            ["Screenshot"] if len(stored_files) == 1
+            else [f"Screenshot {i}" for i in range(1, len(stored_files) + 1)]
+        ),
         submission_type="web_form",
         forward_method="form",
         review_checks=[],
         country=country,
         channel=channel,
-        screenshot_files=[stored] if stored else [],
+        screenshot_files=stored_files,
         needs_manual_review=True,
     )
     print(f"[Intake] Website submission received ({channel}{', ' + country if country else ''}).", flush=True)

@@ -22,7 +22,7 @@ It is a separate copy of the ScamWatcher (Australia) MVP, with its own mailbox, 
 3. Otherwise a reply is drafted and waits in **Needs approval**.
 
 **By the website form**
-1. `/intake` validates the email address, checks the screenshot really is an image (PNG, JPG, GIF, WebP or HEIC, up to 10 MB), and rate-limits each connection.
+1. `/intake` validates the email address, accepts up to 5 screenshots and checks each really is an image (PNG, JPG, GIF, WebP or HEIC, up to 10 MB each), and rate-limits each connection.
 2. The submission always goes to **Needs manual review**. No automatic reply is sent to the address typed into the form.
 3. The person is sent back to the website with a confirmation message.
 

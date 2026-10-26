@@ -220,6 +220,7 @@ table{border-collapse:collapse;width:100%}
 .form-result.is-ok{background:var(--lagoon-soft);border-color:var(--lagoon-200);color:var(--teal-dark)}
 .form-result.is-error{background:var(--coral-soft);border-color:var(--coral-line);color:var(--coral-ink)}
 .form-result strong{display:block}
+.field-hint{margin:2px 0 0;font-size:var(--fs-xs);color:var(--muted)}
 .copy-status{font-size:var(--fs-xs);color:var(--teal-dark);font-weight:600;min-height:1.2em}
 .or{display:flex;align-items:center;gap:var(--s3);margin:var(--s4) var(--s5) 0;color:var(--muted);font-size:var(--fs-2xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
@@ -625,8 +626,9 @@ table{border-collapse:collapse;width:100%}
           </div>
         </div>
         <div class="field">
-          <label for="screenshot">Screenshot of the message</label>
-          <input id="screenshot" name="screenshot" type="file" accept="image/*">
+          <label for="screenshot">Screenshots of the message <span class="opt">(up to 5)</span></label>
+          <input id="screenshot" name="screenshot" type="file" accept="image/*" multiple aria-describedby="screenshot-hint">
+          <p class="field-hint" id="screenshot-hint">Add more than one if the conversation is long. Each image up to 10 MB.</p>
         </div>
         <div class="field">
           <label for="notes">Anything else we should know? <span class="opt">(optional)</span></label>
@@ -1102,6 +1104,24 @@ table{border-collapse:collapse;width:100%}
   }
 })();
 
+/* Screenshots: at most 5, checked as soon as they're chosen. */
+(function(){
+  var input=document.getElementById('screenshot');
+  if(!input)return;
+  input.addEventListener('change',function(){
+    var hint=document.getElementById('screenshot-hint');
+    var n=input.files?input.files.length:0;
+    if(n>5){
+      input.setCustomValidity('Please choose up to 5 screenshots.');
+      input.reportValidity();
+      if(hint)hint.textContent='You chose '+n+' images. Please choose up to 5.';
+    }else{
+      input.setCustomValidity('');
+      if(hint)hint.textContent=n>1?(n+' screenshots chosen.'):'Add more than one if the conversation is long. Each image up to 10 MB.';
+    }
+  });
+})();
+
 /* After the form is sent, the dashboard redirects back with ?submitted=... */
 (function(){
   var box=document.getElementById('form-result');
@@ -1110,7 +1130,8 @@ table{border-collapse:collapse;width:100%}
   var messages={
     ok:['is-ok','Thank you, we have your message.','We\'ll check it and reply to the email address you gave us with our advice. Please don\'t click any links or reply to the sender in the meantime.'],
     email:['is-error','Please check your email address.','We need a valid email address so we can send you our advice.'],
-    file:['is-error','We couldn\'t accept that file.','Please send a screenshot image (PNG, JPG, GIF, WebP or iPhone HEIC) under 10 MB, or email it to check@scamwatcherpacific.com.'],
+    file:['is-error','We couldn\'t accept one of those files.','Please send screenshot images (PNG, JPG, GIF, WebP or iPhone HEIC), each under 10 MB, or email them to check@scamwatcherpacific.com.'],
+    toomany:['is-error','Too many screenshots.','Please choose up to 5 screenshots. If you have more, email them to check@scamwatcherpacific.com.'],
     empty:['is-error','Please add a screenshot or a note.','Attach a screenshot of the message, or describe it in the notes box.'],
     busy:['is-error','Too many submissions from this connection.','Please wait an hour and try again, or email check@scamwatcherpacific.com.']
   };
