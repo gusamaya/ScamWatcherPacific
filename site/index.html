@@ -315,14 +315,26 @@ table{border-collapse:collapse;width:100%}
 .report-card{background:var(--surface);border:1px solid var(--sand-deep);border-radius:var(--r-md);overflow:hidden}
 .report-card h3{padding:var(--s4) var(--s5) var(--s1);margin:0;font-size:var(--fs-md)}
 .report-card > p{padding:0 var(--s5) var(--s4);color:var(--muted);font-size:var(--fs-sm)}
-.report-table th,.report-table td{text-align:left;padding:var(--s3) var(--s5);font-size:var(--fs-sm);border-top:1px solid var(--sand-deep)}
-.report-table thead th{background:#FBF5EC;font-size:var(--fs-2xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.report-table td{color:var(--muted)}
+.report-pick{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:0 var(--s5) var(--s4)}
+.report-pick label{font-weight:600;color:var(--ink-strong);font-size:var(--fs-sm)}
+.report-pick select{min-height:44px;min-width:220px;max-width:100%;padding:8px 36px 8px 12px;border:1.5px solid var(--line-strong);border-radius:var(--r-sm);background:var(--surface);font:inherit;color:var(--ink-strong)}
+.report-list{border-top:1px solid var(--sand-deep)}
+.report-country{padding:var(--s4) var(--s5);border-bottom:1px solid var(--sand-deep)}
+.report-country h4{margin:0 0 var(--s2);font-family:var(--display);font-size:var(--fs-sm);color:var(--ink-strong)}
+.report-country dl{margin:0;display:grid;gap:var(--s2)}
+.report-country dl div{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr);gap:var(--s3)}
+.report-country dt{color:var(--muted);font-size:var(--fs-xs)}
+.report-country dd{margin:0;font-weight:600;color:var(--ink-strong);font-size:var(--fs-sm);overflow-wrap:anywhere}
+.report-country a{color:#0B6E6E}
+.js .report-country{display:none}
+.js .report-country.is-shown{display:block;border-bottom:0}
+.js .report-list:not(.has-choice){border-top:0}
+.report-pick.js-only{display:none}
+.js .report-pick.js-only{display:flex}
+.report-note{padding:var(--s3) var(--s5) var(--s4);margin:0;color:var(--muted);font-size:var(--fs-2xs);border-top:1px solid var(--sand-deep);background:#FBF5EC}
 @media (max-width:639px){
-  .report-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-  .report-table tr{display:block;border-top:1px solid var(--sand-deep);padding:var(--s2) 0}
-  .report-table td{display:flex;justify-content:space-between;gap:var(--s3);border:0;padding:var(--s1) var(--s5)}
-  .report-table td::before{content:attr(data-label);font-weight:600;color:var(--ink-strong)}
+  .report-country dl div{grid-template-columns:1fr;gap:0}
+  .report-pick select{width:100%}
 }
 
 /* ==========================================================
@@ -822,21 +834,28 @@ table{border-collapse:collapse;width:100%}
           <li><span class="help-num" aria-hidden="true">1</span><div><strong>Call your bank or mobile money provider now.</strong><p>Ask them to stop or reverse the payment and secure your account.</p></div></li>
           <li><span class="help-num" aria-hidden="true">2</span><div><strong>Change your passwords.</strong><p>Start with email, Facebook and banking, and turn on two-step login.</p></div></li>
           <li><span class="help-num" aria-hidden="true">3</span><div><strong>Warn family and friends.</strong><p>If your account was taken over, scammers may message people you know.</p></div></li>
-          <li><span class="help-num" aria-hidden="true">4</span><div><strong>Report it.</strong><p>Contact your local police and your country's reporting service. [ADD: reporting contacts for each country]</p></div></li>
+          <li><span class="help-num" aria-hidden="true">4</span><div><strong>Report it.</strong><p>Contact your local police and your country's reporting service. <a href="#where-to-report">See who to contact in your country</a>.</p></div></li>
         </ol>
       </div>
       <div class="report">
-        <div class="report-card">
+        <div class="report-card" id="where-to-report">
           <h3>Where to report, by country</h3>
-          <p>[ADD: reporting contacts for each country] Add one row per country you serve.</p>
-          <table class="report-table">
-            <thead><tr><th scope="col">Country</th><th scope="col">Police</th><th scope="col">Reporting service</th></tr></thead>
-            <tbody>
-              <tr><td data-label="Country">[COUNTRY]</td><td data-label="Police">[POLICE CONTACT]</td><td data-label="Reporting service">[REPORTING SERVICE CONTACT]</td></tr>
-              <tr><td data-label="Country">[COUNTRY]</td><td data-label="Police">[POLICE CONTACT]</td><td data-label="Reporting service">[REPORTING SERVICE CONTACT]</td></tr>
-              <tr><td data-label="Country">[COUNTRY]</td><td data-label="Police">[POLICE CONTACT]</td><td data-label="Reporting service">[REPORTING SERVICE CONTACT]</td></tr>
-            </tbody>
-          </table>
+          <p>If you lost money, call your bank or mobile money provider first. Then report it here.</p>
+          <div class="report-pick js-only">
+            <label for="report-country">Choose your country</label>
+            <select id="report-country"><option value="">Select…</option><option value="fj">Fiji</option><option value="ws">Samoa</option><option value="to">Tonga</option><option value="pg">Papua New Guinea</option><option value="vu">Vanuatu</option><option value="sb">Solomon Islands</option><option value="au">Australia</option><option value="nz">New Zealand</option></select>
+          </div>
+          <div class="report-list" aria-live="polite">
+            <section class="report-country" id="report-fj" data-country="fj" aria-label="Fiji"><h4>Fiji</h4><dl><div><dt>Emergency</dt><dd><a href="tel:917">Police 917</a></dd></div><div><dt>Check a caller claiming to be police</dt><dd><a href="tel:+6799905296">National Police Command Centre 9905 296</a></dd></div><div><dt>Report a scam</dt><dd><a href="tel:155">Consumer Council of Fiji, free call 155</a></dd></div><div><dt>Report by email</dt><dd><a href="mailto:complaints@consumersfiji.org">complaints@consumersfiji.org</a></dd></div></dl></section>
+            <section class="report-country" id="report-ws" data-country="ws" aria-label="Samoa"><h4>Samoa</h4><dl><div><dt>Emergency and police</dt><dd><a href="tel:911">911</a></dd></div><div><dt>Report a scam</dt><dd>Samoa Police Service. Go to your nearest police station or call 911</dd></div><div><dt>Money or bank scams</dt><dd><a href="https://cbs.gov.ws/" rel="noopener" target="_blank">Central Bank of Samoa passes scam reports to the police</a></dd></div></dl></section>
+            <section class="report-country" id="report-to" data-country="to" aria-label="Tonga"><h4>Tonga</h4><dl><div><dt>Emergency</dt><dd><a href="tel:922">Police 922</a></dd></div><div><dt>Report a scam</dt><dd><a href="tel:0800922">Tonga Police, free call 0800 922 or 23 713</a></dd></div><div><dt>Hacked accounts and online attacks</dt><dd><a href="mailto:cert@cert.gov.to">CERT Tonga, cert@cert.gov.to</a></dd></div></dl></section>
+            <section class="report-country" id="report-pg" data-country="pg" aria-label="Papua New Guinea"><h4>Papua New Guinea</h4><dl><div><dt>Emergency</dt><dd><a href="tel:112">Police 112</a></dd></div><div><dt>Report a scam</dt><dd>Your nearest Royal PNG Constabulary police station</dd></div><div><dt>Lost money</dt><dd>Contact your bank or mobile money provider straight away</dd></div></dl></section>
+            <section class="report-country" id="report-vu" data-country="vu" aria-label="Vanuatu"><h4>Vanuatu</h4><dl><div><dt>Emergency</dt><dd><a href="tel:111">Police 111 (Digicel) or 1111 (TVL)</a></dd></div><div><dt>Police</dt><dd><a href="tel:+67822222">Port Vila 22 222 · Santo 36 222</a></dd></div><div><dt>Report a scam online</dt><dd><a href="https://cert.gov.vu/index.php/report-incident" rel="noopener" target="_blank">CERT Vanuatu report form</a></dd></div></dl></section>
+            <section class="report-country" id="report-sb" data-country="sb" aria-label="Solomon Islands"><h4>Solomon Islands</h4><dl><div><dt>Emergency</dt><dd><a href="tel:999">Police 999 (free)</a></dd></div><div><dt>Report a scam</dt><dd><a href="tel:+67723666">Royal Solomon Islands Police Force 23666</a></dd></div><div><dt>Lost money</dt><dd>Contact your bank or mobile money provider straight away</dd></div></dl></section>
+            <section class="report-country" id="report-au" data-country="au" aria-label="Australia"><h4>Australia</h4><dl><div><dt>Report a scam</dt><dd><a href="https://www.scamwatch.gov.au/report-a-scam" rel="noopener" target="_blank">Scamwatch</a></dd></div><div><dt>Report to police online</dt><dd><a href="https://www.cyber.gov.au/report-and-recover/report" rel="noopener" target="_blank">ReportCyber</a></dd></div><div><dt>Free recovery help</dt><dd><a href="tel:1800595160">IDCARE 1800 595 160</a></dd></div></dl></section>
+            <section class="report-country" id="report-nz" data-country="nz" aria-label="New Zealand"><h4>New Zealand</h4><dl><div><dt>Report a scam</dt><dd><a href="https://www.ncsc.govt.nz/report/" rel="noopener" target="_blank">National Cyber Security Centre</a></dd></div><div><dt>Lost money</dt><dd><a href="tel:105">NZ Police, call 105</a></dd></div><div><dt>Free recovery help</dt><dd><a href="tel:0800121068">IDCARE 0800 121 068</a></dd></div></dl></section>
+          </div>
+          <p class="report-note">Checked October 2026 from official sources. Not listed? Contact your local police and your bank. In an emergency, call your local emergency number.</p>
         </div>
       </div>
     </div>
@@ -1096,6 +1115,20 @@ table{border-collapse:collapse;width:100%}
 (function(){
   var root=document.documentElement;
   root.classList.add('js');
+
+  // Where to report: show only the chosen country (all are listed without JS).
+  var pick=document.getElementById('report-country');
+  if(pick){
+    var list=document.querySelector('.report-list');
+    var show=function(code){
+      var panels=list.querySelectorAll('.report-country');
+      for(var i=0;i<panels.length;i++){panels[i].classList.toggle('is-shown',panels[i].getAttribute('data-country')===code);}
+      list.classList.toggle('has-choice',!!code);
+      try{ if(code){localStorage.setItem('swp-report-country',code);} }catch(e){}
+    };
+    pick.addEventListener('change',function(){show(pick.value);});
+    try{ var saved=localStorage.getItem('swp-report-country'); if(saved&&document.getElementById('report-'+saved)){pick.value=saved;show(saved);} }catch(e){}
+  }
 
   var btn=document.querySelector('.menu-btn'), nav=document.getElementById('site-nav');
   if(btn&&nav){

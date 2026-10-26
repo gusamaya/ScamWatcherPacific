@@ -80,6 +80,7 @@ Open `http://127.0.0.1:5000`. To try the form locally, change the website form's
 - New scam campaigns: add to `SCAM_PATTERNS` in `review_checks.py` (Pacific ones are at the end).
 - Organisations people are impersonated as: add to `BRANDS` with their official domains.
 - Confirmed scam domains: add to `BLOCKED_DOMAINS` in `trust_lists.py`.
+- Where to report, by country: edit `report_contacts.py` (checked contacts with their sources). It feeds the "Where to report" line in replies; run `python report_contacts.py --html` and paste the output into the website's "Where to report, by country" card.
 
 ## Important
 

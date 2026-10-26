@@ -20,6 +20,7 @@ load_dotenv()
 import auto_review
 import database
 import reply_advice
+import report_contacts
 import uploads
 
 # Write log lines immediately. Without this, output from background threads can
@@ -553,8 +554,21 @@ def build_attachment_insight_lines(submission):
     return deduped
 
 
+def report_line(submission):
+    """'To report it in Samoa, ...' for scams and warning signs, when we know
+    the person's country (the website form asks for it). Empty otherwise."""
+    if reply_advice.build(submission)["tone"] not in ("high", "attention"):
+        return ""
+    return report_contacts.reply_line(submission.get("country") or "")
+
+
 def build_html_email(submission):
     risk = submission.get("risk_rating") or "Needs Attention"
+    report_text = report_line(submission)
+    report_box = (
+        f'<div style="margin:-12px 0 24px 0; padding:12px 16px; background:#F7EEE2; border-radius:10px; font-size:14px; color:#22404D;">'
+        f'<strong>Where to report:</strong> {html_escape(report_text)}</div>'
+    ) if report_text else ""
     action = submission.get("recommended_action") or ""
     findings = normalize_findings(submission.get("findings") or [])
     reference_code = make_reference_code(submission.get("id"))
@@ -724,6 +738,8 @@ def build_html_email(submission):
 
             {reply_advice.html_box(submission, money_contact="your bank or mobile money provider")}
 
+            {report_box}
+
             <div style="font-size:16px; font-weight:700; color:#0B2A3A; margin:0 0 12px 0; padding-top:4px; border-top:1px solid #D3E0E2;">
                 <div style="padding-top:16px;">Why we think this</div>
             </div>
@@ -778,6 +794,8 @@ def build_plain_text_email(submission):
         "",
     ]
     lines += reply_advice.text_block(submission, money_contact="your bank or mobile money provider")
+    if report_line(submission):
+        lines += ["", "Where to report: " + report_line(submission)]
     lines += [
         "",
         "WHY WE THINK THIS",
