@@ -384,6 +384,7 @@ def ensure_schema():
         "auto_review_error": "TEXT",
         "verdict_note": "TEXT",
         "brand": "TEXT",
+        "message_kind": "TEXT",
     }
 
     for column_name, column_type in required_columns.items():
@@ -654,7 +655,7 @@ def build_html_email(submission):
         genuine_box = f"""
             <div style="background:#E7F6EE; border:1px solid #B4E2C8; border-radius:10px; padding:12px 14px; margin:0 0 18px 0; color:#065F3B; font-size:14px; line-height:1.6;">
                 <strong>{html_escape(submission.get("verdict_note"))}</strong>
-                That still doesn't make the links or phone number in it safe to use, so follow the advice above.
+                {"" if reply_advice.is_marketing(submission) else "That still doesn't make the links or phone number in it safe to use, so follow the advice above."}
             </div>
         """
 
