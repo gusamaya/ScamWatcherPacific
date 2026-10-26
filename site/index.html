@@ -637,7 +637,7 @@ table{border-collapse:collapse;width:100%}
           <span><strong>Please don't include passwords, PINs or full card numbers.</strong>Feel free to cover account numbers before sending a screenshot. We will never ask you for passwords, PINs or payment.</span>
         </div>
         <button class="btn btn-dark" type="submit">Send for checking</button>
-        <p class="form-note form-foot">We reply by email. <a href="#privacy">How we handle your message</a></p>
+        <p class="form-note form-foot">We'll check your message and reply to the email address you entered above. <a href="#privacy">How we handle your message</a></p>
       </form>
     </div>
   </div>
@@ -1108,7 +1108,7 @@ table{border-collapse:collapse;width:100%}
   if(!box||!window.URLSearchParams)return;
   var state=new URLSearchParams(window.location.search).get('submitted');
   var messages={
-    ok:['is-ok','Thank you, we have your message.','We\'ll check it and reply by email with our advice. Please don\'t click any links or reply to the sender in the meantime.'],
+    ok:['is-ok','Thank you, we have your message.','We\'ll check it and reply to the email address you gave us with our advice. Please don\'t click any links or reply to the sender in the meantime.'],
     email:['is-error','Please check your email address.','We need a valid email address so we can send you our advice.'],
     file:['is-error','We couldn\'t accept that file.','Please send a screenshot image (PNG, JPG, GIF, WebP or iPhone HEIC) under 10 MB, or email it to check@scamwatcherpacific.com.'],
     empty:['is-error','Please add a screenshot or a note.','Attach a screenshot of the message, or describe it in the notes box.'],
