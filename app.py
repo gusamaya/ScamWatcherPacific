@@ -378,6 +378,7 @@ def ensure_schema():
         "screenshot_text": "TEXT",
         "auto_review": "TEXT",
         "auto_review_error": "TEXT",
+        "verdict_note": "TEXT",
     }
 
     for column_name, column_type in required_columns.items():
@@ -594,6 +595,11 @@ def build_html_email(submission):
         guidance_strong = "We recommend not taking action until this request has been independently verified."
         guidance = "Verify any request using contact details sourced independently from the message, and do not rely on any attachment without verification."
 
+    if submission.get("verdict_note"):
+        # Genuine-looking email: the safe habit, not a scam warning.
+        guidance_strong = "Go to the organisation directly rather than through the email."
+        guidance = "Use their official app, or type their website address yourself, and use the phone number printed on their website or your bill."
+
     is_web_form = (submission.get("submission_type") or "") == "web_form"
     original_from = html_escape(submission.get("from_header") or "Not provided")
     original_subject = html_escape(submission.get("subject") or "(No subject)")
@@ -637,6 +643,15 @@ def build_html_email(submission):
                 <strong>Tip:</strong> {html_escape(check["details"][-1])}
             </div>
             """
+
+    genuine_box = ""
+    if submission.get("verdict_note"):
+        genuine_box = f"""
+            <div style="background:#E7F6EE; border:1px solid #B4E2C8; border-radius:10px; padding:12px 14px; margin:0 0 18px 0; color:#065F3B; font-size:14px; line-height:1.6;">
+                <strong>{html_escape(submission.get("verdict_note"))}</strong>
+                That still doesn't make the links or phone number in it safe to use, so follow the advice below.
+            </div>
+        """
 
     scam_type_box = ""
     if submission.get("scam_type"):
@@ -706,6 +721,8 @@ def build_html_email(submission):
 
             {scam_type_box}
 
+            {genuine_box}
+
             <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:4px;">What to do:</div>
             <div style="font-size:14px; font-weight:700; color:#0B6E6E; margin-bottom:28px;">{html_escape(action)}</div>
 
@@ -761,6 +778,8 @@ def build_plain_text_email(submission):
     ]
     if submission.get("scam_type"):
         lines.append(f"Likely scam type: {submission.get('scam_type')}")
+    if submission.get("verdict_note"):
+        lines += ["", submission.get("verdict_note")]
     if submission.get("recommended_action"):
         lines += ["", "What to do:", submission.get("recommended_action")]
     if findings:

@@ -855,3 +855,5 @@ a { color: var(--navy-700); }
 .read-panel .original-body { margin: 0; }
 .read-panel .helper { margin: 0; }
 .read-meta { margin: 0; }
+
+.verdict-genuine { margin: 6px 0 8px; padding: 8px 10px; border-radius: var(--radius-s); background: var(--low-bg); border: 1px solid var(--low-line); color: var(--low); font-size: 13.5px; font-weight: 600; }
