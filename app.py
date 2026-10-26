@@ -1331,6 +1331,57 @@ def require_login_and_csrf():
     return None
 
 
+# ------------------------------------------------------------------
+# Hang watchdog: if a request runs longer than 20 seconds, write every
+# thread's stack to the log so we can see exactly what it is waiting on.
+# ------------------------------------------------------------------
+import traceback as _traceback
+
+_active_requests = {}
+_active_lock = threading.Lock()
+_watchdog_started = False
+_last_dump = 0.0
+
+
+def _watchdog_loop():
+    global _last_dump
+    while True:
+        time.sleep(5)
+        now_ts = time.time()
+        with _active_lock:
+            slow = [(tid, path, now_ts - started) for tid, (path, started) in _active_requests.items()
+                    if now_ts - started > 20]
+        if slow and now_ts - _last_dump > 60:
+            _last_dump = now_ts
+            frames = sys._current_frames()
+            names = {t.ident: t.name for t in threading.enumerate()}
+            lines = [f"[Watchdog] Slow requests: {[(p, round(d)) for _, p, d in slow]}"]
+            for ident, frame in frames.items():
+                lines.append(f"[Watchdog] --- thread {names.get(ident, ident)} ---")
+                lines.extend("[Watchdog] " + l.rstrip() for l in "".join(_traceback.format_stack(frame)).splitlines())
+            print("\n".join(lines), flush=True)
+
+
+def _start_watchdog():
+    global _watchdog_started
+    if not _watchdog_started:
+        _watchdog_started = True
+        threading.Thread(target=_watchdog_loop, daemon=True, name="watchdog").start()
+
+
+@app.before_request
+def _track_request_start():
+    _start_watchdog()
+    with _active_lock:
+        _active_requests[threading.get_ident()] = (request.path, time.time())
+
+
+@app.teardown_request
+def _track_request_end(_exc=None):
+    with _active_lock:
+        _active_requests.pop(threading.get_ident(), None)
+
+
 @app.after_request
 def add_security_headers(response):
     response.headers.setdefault("X-Frame-Options", "DENY")
