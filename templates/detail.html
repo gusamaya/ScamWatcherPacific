@@ -77,7 +77,7 @@
             {% if ar %}
             <p class="callout auto-note">
                 <strong>Draft written by the automatic review.</strong>
-                Claude read the screenshot{% if ar.confidence %} (confidence: {{ ar.confidence|lower }}){% endif %}. Check the screenshot and the text it read before you send.
+                Claude read the screenshot{% if ar.confidence %} (confidence: {{ ar.confidence|lower }}){% endif %}.{% if auto_send_enabled and (ar.confidence or '')|lower == 'high' %} High confidence: this reply is sent automatically.{% else %} Check the screenshot and the text it read before you send.{% endif %}
                 {% if ar.readable == false %}It couldn't read the image clearly, so review it yourself.{% endif %}
             </p>
             {% endif %}

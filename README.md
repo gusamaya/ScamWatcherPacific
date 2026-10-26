@@ -23,11 +23,11 @@ It is a separate copy of the ScamWatcher (Australia) MVP, with its own mailbox, 
 
 **By the website form**
 1. `/intake` validates the email address, accepts up to 5 screenshots and checks each really is an image (PNG, JPG, GIF, WebP or HEIC, up to 10 MB each), and rate-limits each connection.
-2. The submission always goes to **Needs manual review**. No automatic reply is sent to the address typed into the form.
+2. The submission goes to **Needs manual review** until the automatic screenshot review reads it. With auto-send on, a high-confidence review is replied to automatically; otherwise it waits for **Approve and send**. Notes-only submissions always wait for a person. The per-address rate limit stops the form being used to flood someone else's inbox.
 3. The person is sent back to the website with a confirmation message.
 
 **Automatic screenshot review**
-When `ANTHROPIC_API_KEY` is set, every screenshot (from the form or an email) is sent to Claude, which reads the message, translates any Pacific-language text, and drafts an assessment, scam type, advice and observations. The rule-based checks also run on the text it read, as a cross-check. The submission then moves to **Needs approval** with a "Draft written by the automatic review" note, and the text read from the screenshot is shown next to the image. A person still approves every reply, and screenshot submissions are never auto-sent.
+When `ANTHROPIC_API_KEY` is set, every screenshot (from the form or an email) is sent to Claude, which reads the message, translates any Pacific-language text, and drafts an assessment, scam type, advice and observations. The rule-based checks also run on the text it read, as a cross-check. The submission then moves to **Needs approval** with a "Draft written by the automatic review" note, and the text read from the screenshot is shown next to the image. High-confidence reviews are sent automatically when auto-send is on; anything less certain waits for a person.
 
 If the review fails (or the photo is an iPhone HEIC, which Claude can't read), the submission stays in **Needs manual review** with the reason shown, and **Review the screenshot again** retries it. Screenshots that arrived before the key was set are reviewed when the app next starts. The model is set with `CLAUDE_MODEL` (default `claude-sonnet-5-5`).
 
@@ -36,7 +36,7 @@ Because screenshots go to Anthropic for reading, the website's privacy section s
 **Replying to a manual submission**
 Open it, look at the screenshot, choose an assessment, write what they should do and what you noticed, then **Save reply**. Check the preview and **Approve and send**. The reply comes from `check@scamwatcherpacific.com`.
 
-Screenshot submissions are **never auto-sent**, even if `AUTO_SEND_ENABLED=true`.
+With `AUTO_SEND_ENABLED=true`, replies go out automatically for forwarded emails and for screenshots the automatic review read with **high** confidence. Medium or low confidence, unreadable images, failed reviews, notes-only form submissions and emails sent directly to us always wait for **Approve and send**. `AUTO_SEND_SCREENSHOTS=false` puts every screenshot reply back in human hands, and `AUTO_SEND_AFTER` (UTC) stops old drafts being mailed when you switch auto-send on.
 
 ## Privacy, retention and deletion
 

@@ -69,6 +69,13 @@ RETENTION_DAYS = int(os.getenv("RETENTION_DAYS", "0"))
 # "Approve & send". Set AUTO_SEND_ENABLED=true only once you trust the scoring.
 AUTO_SEND_ENABLED = os.getenv("AUTO_SEND_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
 AUTO_SEND_INTERVAL_SECONDS = int(os.getenv("AUTO_SEND_INTERVAL_SECONDS", "15"))
+# Screenshot replies are sent automatically only when the automatic review
+# read them with high confidence. Set to false to send every screenshot reply
+# by hand.
+AUTO_SEND_SCREENSHOTS = os.getenv("AUTO_SEND_SCREENSHOTS", "true").strip().lower() in {"1", "true", "yes", "on"}
+# Only reply automatically to submissions received at or after this UTC time
+# ("YYYY-MM-DD HH:MM:SS"), so switching auto-send on never mails old drafts.
+AUTO_SEND_AFTER = os.getenv("AUTO_SEND_AFTER", "").strip()
 MAX_SEND_ATTEMPTS = int(os.getenv("MAX_SEND_ATTEMPTS", "3"))
 # A submission left in "sending" this long (e.g. the server restarted mid-send)
 # is treated as failed so it can be retried or reviewed.
@@ -1015,16 +1022,30 @@ def get_pending_auto_send_ids(limit=25):
           AND COALESCE(response_status, 'draft') IN ('draft', 'failed')
           AND COALESCE(proposed_response, '') <> ''
           AND COALESCE(send_attempts, 0) < ?
-          -- Only ever auto-reply to people who forwarded an email to us. Direct
-          -- emails (and older records saved before this was tracked) need a
-          -- person to click "Approve and Send".
-          AND submission_type = 'forwarded'
-          -- Screenshot submissions are always sent by a person clicking send.
-          AND COALESCE(screenshot_files, '[]') = '[]'
+          AND (
+            -- Emails forwarded to us, checked by the rule-based review.
+            -- Direct emails (the "sender" is usually the scammer) and older
+            -- records saved before this was tracked always wait for a person.
+            (submission_type = 'forwarded' AND COALESCE(screenshot_files, '[]') = '[]')
+            OR
+            -- Screenshots (website form or email) once the automatic review
+            -- has read them with HIGH confidence. Medium/low confidence,
+            -- unreadable images and failed reviews wait for a person.
+            (submission_type IN ('forwarded', 'web_form')
+             AND COALESCE(screenshot_files, '[]') <> '[]'
+             AND AUTO_SCREENSHOTS_OK = 1
+             AND LOWER(COALESCE(confidence_label, '')) = 'high'
+             AND COALESCE(auto_review, '') <> ''
+             AND COALESCE(auto_review, '') NOT LIKE '%"readable": false%'
+             AND COALESCE(auto_review_error, '') = '')
+          )
+          -- Never reply automatically to anything received before automatic
+          -- replies were switched on (old drafts and test messages).
+          AND (? = '' OR datetime(COALESCE(created_at, received_at)) >= datetime(?))
         ORDER BY datetime(received_at) ASC, id ASC
         LIMIT ?
-        """,
-        (MAX_SEND_ATTEMPTS, limit),
+        """.replace("AUTO_SCREENSHOTS_OK", "1" if AUTO_SEND_SCREENSHOTS else "0"),
+        (MAX_SEND_ATTEMPTS, AUTO_SEND_AFTER, AUTO_SEND_AFTER, limit),
     ).fetchall()
     conn.close()
     return [row["id"] for row in rows]
