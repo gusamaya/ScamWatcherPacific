@@ -48,6 +48,15 @@ if SITE_URL and not SITE_URL.startswith(("http://", "https://")):
 # Off unless set: a copy of every reply goes to this address. Leave empty to keep
 # submissions visible only to the review team, as the website promises.
 AUDIT_BCC_EMAIL = os.getenv("AUDIT_BCC_EMAIL", "").strip()
+# Reply wording and colours, so the same code serves both ScamWatcher sites.
+REPLY_GREETING = os.getenv("REPLY_GREETING", "Hello,")
+REPLY_INTRO = os.getenv("REPLY_INTRO", "Thank you for sending us this message to check. Here is our advice.")
+REPLY_SIGNOFF = os.getenv("REPLY_SIGNOFF", "Kind regards,")
+MONEY_CONTACT = os.getenv("MONEY_CONTACT", "your bank or mobile money provider")
+EMAIL_ACCENT = os.getenv("EMAIL_ACCENT", "#7FD1C7")
+EMAIL_DARK = os.getenv("EMAIL_DARK", "#0B2A3A")
+# Country recorded for website submissions when the form doesn't ask for one.
+DEFAULT_COUNTRY = os.getenv("DEFAULT_COUNTRY", "").strip()
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 
@@ -653,14 +662,14 @@ def build_html_email(submission):
         label, bg, fg, border = status_styles.get(check.get("status"), status_styles["info"])
         check_rows += f"""
                 <tr>
-                    <td valign="top" style="padding:8px 10px 8px 0; font-weight:700; color:#0B2A3A; white-space:nowrap;">{html_escape(check.get("title"))}</td>
+                    <td valign="top" style="padding:8px 10px 8px 0; font-weight:700; color:{EMAIL_DARK}; white-space:nowrap;">{html_escape(check.get("title"))}</td>
                     <td valign="top" style="padding:8px 10px;"><span style="display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:{bg}; color:{fg}; border:1px solid {border};">{label}</span></td>
                     <td valign="top" style="padding:8px 0; color:#22404D;">{html_escape(check.get("headline"))}</td>
                 </tr>"""
     checks_box = ""
     if check_rows:
         checks_box = f"""
-            <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:6px;">How we checked it:</div>
+            <div style="font-size:14px; font-weight:700; color:{EMAIL_DARK}; margin-bottom:6px;">How we checked it:</div>
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; margin:0 0 22px 0; font-size:14px; line-height:1.5;">
                 {check_rows}
             </table>
@@ -687,7 +696,7 @@ def build_html_email(submission):
     scam_type_box = ""
     if submission.get("scam_type"):
         scam_type_box = f"""
-            <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:4px;">Likely scam type:</div>
+            <div style="font-size:14px; font-weight:700; color:{EMAIL_DARK}; margin-bottom:4px;">Likely scam type:</div>
             <div style="font-size:14px; color:#991b1b; font-weight:700; margin-bottom:14px;">{html_escape(submission.get("scam_type"))}</div>
         """
 
@@ -726,9 +735,9 @@ def build_html_email(submission):
     <body style="margin:0; padding:20px; background:#ffffff; font-family:Arial, sans-serif; font-size:14px; color:#22404D; line-height:1.6;">
         <div style="max-width:640px; margin:0 auto;">
 
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; margin-bottom:24px; border-bottom:3px solid #7FD1C7;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; margin-bottom:24px; border-bottom:3px solid {EMAIL_ACCENT};">
                 <tr>
-                    <td valign="bottom" style="font-size:20px; font-weight:700; color:#0B2A3A; padding-bottom:10px;">
+                    <td valign="bottom" style="font-size:20px; font-weight:700; color:{EMAIL_DARK}; padding-bottom:10px;">
                         {html_escape(BRAND_NAME)}
                     </td>
                     <td valign="bottom" align="right" style="font-size:11px; font-weight:500; color:#46606D; line-height:1.2; padding-bottom:12px;">
@@ -737,17 +746,17 @@ def build_html_email(submission):
                 </tr>
             </table>
 
-            <div style="margin-bottom:10px;">Hello,</div>
+            <div style="margin-bottom:10px;">{html_escape(REPLY_GREETING)}</div>
 
             <div style="margin-bottom:18px;">
-                Thank you for sending us this message to check. Here is our advice.
+                {html_escape(REPLY_INTRO)}
             </div>
 
-            {reply_advice.html_box(submission, money_contact="your bank or mobile money provider")}
+            {reply_advice.html_box(submission, money_contact=MONEY_CONTACT)}
 
             {report_box}
 
-            <div style="font-size:16px; font-weight:700; color:#0B2A3A; margin:0 0 12px 0; padding-top:4px; border-top:1px solid #D3E0E2;">
+            <div style="font-size:16px; font-weight:700; color:{EMAIL_DARK}; margin:0 0 12px 0; padding-top:4px; border-top:1px solid #D3E0E2;">
                 <div style="padding-top:16px;">Why we think this</div>
             </div>
 
@@ -762,7 +771,7 @@ def build_html_email(submission):
 
             {checks_box}
 
-            <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:8px;">What we noticed:</div>
+            <div style="font-size:14px; font-weight:700; color:{EMAIL_DARK}; margin-bottom:8px;">What we noticed:</div>
             <ul style="margin:0 0 22px 20px; padding:0; color:#22404D;">
                 {findings_items}
             </ul>
@@ -771,14 +780,14 @@ def build_html_email(submission):
 
             {tip_box}
 
-            <div style="margin-bottom:6px;">Kind regards,</div>
-            <div style="font-weight:700; color:#0B2A3A;">{html_escape(ADVISOR_NAME)}</div>
+            <div style="margin-bottom:6px;">{html_escape(REPLY_SIGNOFF)}</div>
+            <div style="font-weight:700; color:{EMAIL_DARK};">{html_escape(ADVISOR_NAME)}</div>
             {advisor_title_line}
             <div style="font-size:12px; color:#46606D; margin-top:12px; line-height:1.5;">{html_escape(INDEPENDENCE_NOTE)}</div>
 
             <div style="margin-top:28px; margin-bottom:18px; font-size:12px; line-height:1.4; color:#B8CCD0; white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;">{divider}</div>
 
-            <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:8px;">What you sent us (for reference)</div>
+            <div style="font-size:14px; font-weight:700; color:{EMAIL_DARK}; margin-bottom:8px;">What you sent us (for reference)</div>
             <div style="font-size:13px; line-height:1.6; color:#374151;">
                 {original_details}
                 <div style="margin-top:8px; font-size:12px; color:#46606D;">Links have been removed from this reply for safety. You can ask us to delete your submission at any time by emailing <a href="mailto:info@scamwatcherpacific.com?subject=Please%20delete%20what%20I%20sent" style="color:#46606D;">info@scamwatcherpacific.com</a>.</div>
@@ -795,12 +804,12 @@ def build_plain_text_email(submission):
     reference_code = make_reference_code(submission.get("id"))
     findings = normalize_findings(submission.get("findings") or [])
     lines = [
-        "Hello,",
+        REPLY_GREETING,
         "",
-        "Thank you for sending us this message to check. Here is our advice.",
+        REPLY_INTRO,
         "",
     ]
-    lines += reply_advice.text_block(submission, money_contact="your bank or mobile money provider")
+    lines += reply_advice.text_block(submission, money_contact=MONEY_CONTACT)
     if report_line(submission):
         lines += ["", "Where to report: " + report_line(submission)]
     lines += [
@@ -817,7 +826,7 @@ def build_plain_text_email(submission):
         lines += ["", "What we noticed:"] + [f"- {f}" for f in findings[:5]]
     lines += [
         "",
-        "Kind regards,",
+        REPLY_SIGNOFF,
         ADVISOR_NAME,
     ]
     if ADVISOR_TITLE:
@@ -1641,6 +1650,8 @@ def intake():
         return _back_to_site("email")
 
     country = re.sub(r"\s+", " ", (request.form.get("country") or "")).strip()[:80]
+    if not country:
+        country = DEFAULT_COUNTRY
     channel = (request.form.get("channel") or "").strip()
     if not channel:
         channel = "Not stated"
