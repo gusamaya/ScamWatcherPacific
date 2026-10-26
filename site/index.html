@@ -415,6 +415,8 @@ table{border-collapse:collapse;width:100%}
 .about-card::before{content:"";position:absolute;inset:0;background:var(--motif-chart-ink);background-size:280px 280px;pointer-events:none}
 .about-card > *{position:relative}
 .photo{flex:none;width:144px;height:144px;border-radius:50%;background:var(--lagoon-soft);border:2px dashed var(--line-strong);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;text-align:center;font-size:var(--fs-xs);font-weight:600;padding:var(--s3)}
+.photo-logo{border:2px solid var(--lagoon-200);padding:0}
+.footer-note{margin:var(--s3) 0 0;color:var(--on-dark-muted);font-size:var(--fs-sm)}
 .about-copy{flex:1 1 420px;min-width:0}
 .about-copy h2{margin-top:var(--s2)}
 .about-copy p+p{margin-top:var(--s3)}
@@ -1046,12 +1048,12 @@ table{border-collapse:collapse;width:100%}
 <section class="section about" id="about" aria-labelledby="about-title" style="padding-top:0">
   <div class="wrap">
     <div class="about-card">
-      <div class="photo">[Team photo]</div>
+      <div class="photo photo-logo"><svg width="78" height="94" aria-hidden="true" focusable="false"><use href="#sw-logo"/></svg></div>
       <div class="about-copy">
         <p class="eyebrow">About</p>
         <h2 id="about-title">Who we are</h2>
-        <p>ScamWatcher Pacific is run by [YOUR NAME / TEAM], the people behind <a href="https://scamwatcher.com.au">ScamWatcher</a> in Australia. [ONE OR TWO SENTENCES ON WHY YOU STARTED THIS AND YOUR PACIFIC CONNECTION.]</p>
-        <p class="meta">Registered business: [ABN / REGISTRATION NUMBER]. Based in [LOCATION].</p>
+        <p>ScamWatcher Pacific is run by the ScamWatcher team, the people behind <a href="https://scamwatcher.com.au">ScamWatcher</a> in Australia. We started it after seeing scams hit people we know, and wanted to give Pacific families a simple, free way to check a message before they click, pay or share.</p>
+        <p class="meta">With a presence in Fiji.</p>
       </div>
     </div>
   </div>
@@ -1094,8 +1096,7 @@ table{border-collapse:collapse;width:100%}
         <li><a href="#about">About</a></li>
         <li><a href="#privacy">Your privacy</a></li>
       </ul>
-      <div class="placeholder">[ABN / REGISTRATION NUMBER]</div>
-      <div class="placeholder">[LOCATION]</div>
+      <p class="footer-note">With a presence in Fiji</p>
     </div>
   </div>
   <div class="footer-bottom">
