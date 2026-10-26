@@ -1621,7 +1621,9 @@ def intake():
 
     country = re.sub(r"\s+", " ", (request.form.get("country") or "")).strip()[:80]
     channel = (request.form.get("channel") or "").strip()
-    if channel not in INTAKE_CHANNELS:
+    if not channel:
+        channel = "Not stated"
+    elif channel not in INTAKE_CHANNELS:
         channel = "Other"
     notes = (request.form.get("notes") or "").strip()[:4000]
 
@@ -1643,7 +1645,7 @@ def intake():
     if not stored and not notes:
         return _back_to_site("empty")
 
-    subject = f"Website form · {channel}" + (f" · {country}" if country else "")
+    subject = " · ".join(["Website form"] + ([channel] if channel != "Not stated" else []) + ([country] if country else []))
     message_id = f"web-{uuid.uuid4()}"
     database.insert_submission(
         message_id=message_id,

@@ -643,11 +643,12 @@ table{border-collapse:collapse;width:100%}
         <div class="field-row">
           <div class="field">
             <label for="country">Country</label>
-            <input id="country" name="country" type="text" autocomplete="country-name" placeholder="e.g. Fiji, Samoa, Tonga">
+            <select id="country" name="country" autocomplete="country-name"><option value="">Choose…</option><optgroup label="Pacific"><option>Fiji</option><option>Samoa</option><option>Tonga</option><option>Papua New Guinea</option><option>Vanuatu</option><option>Solomon Islands</option><option>Kiribati</option><option>Tuvalu</option><option>Cook Islands</option><option>Niue</option><option>Nauru</option><option>American Samoa</option><option>Tokelau</option><option value="Other Pacific country">Other Pacific country</option></optgroup><optgroup label="Living overseas"><option>Australia</option><option>New Zealand</option><option>United States</option><option value="Other country">Other country</option></optgroup></select>
           </div>
           <div class="field">
             <label for="channel">Where did you get the message?</label>
             <select id="channel" name="channel">
+              <option value="">Choose…</option>
               <option>Facebook or Messenger</option>
               <option>WhatsApp</option>
               <option>Text message (SMS)</option>
