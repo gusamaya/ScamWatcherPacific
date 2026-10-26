@@ -774,7 +774,7 @@ def build_html_email(submission):
             <div style="font-size:14px; font-weight:700; color:#0B2A3A; margin-bottom:8px;">What you sent us (for reference)</div>
             <div style="font-size:13px; line-height:1.6; color:#374151;">
                 {original_details}
-                <div style="margin-top:8px; font-size:12px; color:#46606D;">Links have been removed from this reply for safety. You can ask us to delete your submission at any time by replying to this email.</div>
+                <div style="margin-top:8px; font-size:12px; color:#46606D;">Links have been removed from this reply for safety. You can ask us to delete your submission at any time by emailing <a href="mailto:info@scamwatcherpacific.com?subject=Please%20delete%20what%20I%20sent" style="color:#46606D;">info@scamwatcherpacific.com</a>.</div>
             </div>
 
         </div>
