@@ -145,6 +145,11 @@ def _normalise_email_record(record):
     }
 
 
+def _is_temporary_db_error(exc):
+    text = str(exc).lower()
+    return "database is locked" in text or "database is busy" in text or "database table is locked" in text
+
+
 def _call_with_supported_args(func, kwargs):
     sig = inspect.signature(func)
     accepted = {}
@@ -576,6 +581,12 @@ def main():
                     )
 
                 except Exception as email_error:
+                    if _is_temporary_db_error(email_error):
+                        # Not the email's fault: leave it unread and try again
+                        # on the next check, however many times it takes.
+                        _log(f"Database busy, will retry this email on the next check: {email_error}")
+                        continue
+
                     key = ""
                     try:
                         key = email_record["message_id"] or email_record["uid"]

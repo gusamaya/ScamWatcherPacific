@@ -11,9 +11,22 @@ def get_connection():
     if db_dir:
         os.makedirs(db_dir, exist_ok=True)
 
-    conn = sqlite3.connect(DB_NAME)
+    # Wait up to 30 seconds for another thread to finish writing instead of
+    # failing straight away with "database is locked".
+    conn = sqlite3.connect(DB_NAME, timeout=30)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA busy_timeout = 30000")
     return conn
+
+
+def enable_wal():
+    """Write-ahead logging: readers (the dashboard) never block the writer
+    (the inbox checker) and the other way round. Persistent once set."""
+    conn = sqlite3.connect(DB_NAME, timeout=30)
+    try:
+        conn.execute("PRAGMA journal_mode = WAL")
+    finally:
+        conn.close()
 
 
 def column_exists(conn, table_name, column_name):
@@ -66,6 +79,8 @@ def ensure_columns():
 
 
 def init_db():
+    get_connection().close()  # makes sure the folder exists
+    enable_wal()
     conn = get_connection()
     cursor = conn.cursor()
 

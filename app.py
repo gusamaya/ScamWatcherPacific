@@ -114,6 +114,7 @@ def get_connection():
 
     conn = sqlite3.connect(DB_NAME, timeout=30)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA busy_timeout = 30000")
     return conn
 
 
@@ -327,6 +328,8 @@ def column_exists(conn, table_name, column_name):
 
 
 def ensure_schema():
+    get_connection().close()  # makes sure the folder exists
+    database.enable_wal()
     conn = get_connection()
     cursor = conn.cursor()
 
