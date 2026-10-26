@@ -277,8 +277,9 @@ table{border-collapse:collapse;width:100%}
 .steps{list-style:none;position:relative}
 .step{position:relative;display:flex;flex-direction:column;gap:var(--s2)}
 .step-top{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s3)}
-.step-num{flex:none;width:52px;height:52px;border-radius:50%;background:var(--ocean);color:var(--lagoon);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:var(--fs-lg);box-shadow:0 0 0 6px var(--lagoon-soft);position:relative;z-index:1}
-.step-label{font-size:var(--fs-2xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.step-num{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ocean);color:var(--lagoon);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:var(--fs-md,1.25rem)}
+.step-label{margin-left:auto;padding:3px 10px;border-radius:999px;background:var(--lagoon-soft);color:#0B6E6E;font-size:var(--fs-2xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.step-label.us{background:var(--ocean);color:var(--lagoon)}
 .step h3{margin-bottom:0}
 .checklist{list-style:none;display:grid;gap:var(--s2);margin-top:var(--s3);padding-top:var(--s3);border-top:1px solid var(--line)}
 .checklist li{display:flex;gap:var(--s2);align-items:flex-start;font-size:var(--fs-sm);color:var(--ink)}
@@ -459,7 +460,6 @@ table{border-collapse:collapse;width:100%}
   .facts{border-top:0;border-left:1px solid var(--line);padding:var(--s2) var(--s6) var(--s5)}
   .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .steps{gap:var(--s5)}
-  .steps .step:not(:last-child)::after{content:"";position:absolute;top:calc(var(--s5) + 26px);left:calc(var(--s5) + 64px);right:calc(-1 * var(--s5) - var(--s5));border-top:2px dashed var(--line-strong);z-index:0}
   .help-body{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:var(--s7)}
   .privacy-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:var(--s7);align-items:start}
   .footer-grid{grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr))}
@@ -713,13 +713,14 @@ table{border-collapse:collapse;width:100%}
         <p>Take a screenshot of the message or forward the email. Don't click any links or reply to the sender first.</p>
       </li>
       <li class="card step">
-        <div class="step-top"><div class="step-num" aria-hidden="true">2</div><span class="step-label">Us</span></div>
+        <div class="step-top"><div class="step-num" aria-hidden="true">2</div><span class="step-label us">Us</span></div>
         <h3>We review the warning signs</h3>
         <p>We look at:</p>
         <ul class="checklist">
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B6E6E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Who sent it</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B6E6E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>What it asks you to do</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B6E6E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Where any links really go</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B6E6E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Whether it matches a known scam</li>
         </ul>
       </li>
       <li class="card step">
