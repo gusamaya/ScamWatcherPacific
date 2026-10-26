@@ -1313,6 +1313,7 @@ def get_csrf_token():
 app.jinja_env.globals["csrf_token"] = get_csrf_token
 app.jinja_env.globals["auto_send_enabled"] = AUTO_SEND_ENABLED
 app.jinja_env.globals["brand_name"] = BRAND_NAME
+app.jinja_env.globals["is_marketing"] = reply_advice.is_marketing
 app.jinja_env.globals["reference_prefix"] = REFERENCE_PREFIX
 app.jinja_env.globals["retention_days"] = RETENTION_DAYS
 app.jinja_env.globals["auto_review_enabled"] = auto_review.is_enabled()
