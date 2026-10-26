@@ -63,6 +63,10 @@ Until `RETENTION_DAYS` is set, nothing is deleted automatically and the logs say
    Not using Render? Build with `pip install -r requirements.txt`, start with `gunicorn app:app --workers 1 --threads 4`, keep a persistent disk at `/var/data`, and replace `YOUR-DASHBOARD-URL` in `site/index.html` yourself. Keep it to **one worker**: the inbox checker runs inside the app.
 5. **Fill the site placeholders** (response time, retention days, reporting contacts and so on). The response time also appears in the form's confirmation message.
 
+## Privacy policy and terms
+
+`site/privacy.html` and `site/terms.html` are built from the wording in `build_legal_pages.py`, using the site's own header, footer and styles. Edit the wording there and run `python build_legal_pages.py`. Keep it true to how the service works: if the retention period, AI provider, hosting, or whether a person checks every reply changes, update it.
+
 ## Running locally
 
 ```bash

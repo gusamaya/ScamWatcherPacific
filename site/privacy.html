@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy policy | ScamWatcher Pacific</title>
+<meta name="description" content="How ScamWatcher Pacific collects, uses, shares and deletes the messages you send us.">
+<meta name="theme-color" content="#0B2A3A">
+<!-- Favicon: simplified shield-and-star mark (letters are too small to read at tab size) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cpath d='M50 2 51.8 8.4 57.8 5.8 53.9 11.1 59.8 14.2 53.1 14.5 54.3 21 50 16 45.7 21 46.9 14.5 40.2 14.2 46.1 11.1 42.2 5.8 48.2 8.4Z' fill='%23D9A93A'/%3E%3Cpath d='M10 32Q50 22 90 32V68C90 94 72 108 50 118 28 108 10 94 10 68Z' fill='%230F1E45'/%3E%3Cpath d='M19 39Q50 31 81 39V68C81 89 67 101 50 109 33 101 19 89 19 68Z' fill='%231C2D5E' stroke='%23E2B64C' stroke-width='5'/%3E%3Cpath d='M50 33V108C67 100 81 89 81 68V39Q66 35 50 33Z' fill='%230E1B40'/%3E%3Ctext x='50' y='84' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='46' fill='%23fff'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Only the weights in use are requested; display=swap shows system text immediately on slow connections. -->
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   Design tokens
+   ========================================================== */
+:root{
+  /* Palette: ocean navy + lagoon, with sand and coral used sparingly */
+  --ocean-950:#061A25;
+  --ocean:#0B2A3A;
+  --ocean-2:#12384B;
+  --ocean-3:#1E4C61;
+  --lagoon:#7FD1C7;
+  --lagoon-200:#BFE7E1;
+  --lagoon-soft:#E3F2EF;
+  --teal:#0B6E6E;
+  --teal-dark:#085454;
+  --ground:#F4F7F6;
+  --surface:#FFFFFF;
+  --sand:#F7EEE2;
+  --sand-deep:#E8D5BC;
+  --coral:#B5501E;
+  --coral-ink:#8A3B12;
+  --coral-soft:#FBEEE6;
+  --coral-line:#EBC6B0;
+  --ink:#22404D;
+  --ink-strong:#0B2A3A;
+  --muted:#4A6370;
+  --line:#D8E3E4;
+  --line-strong:#B8CCD0;
+  --on-dark:#D6E6EA;
+  --on-dark-muted:#A9C6CD;
+  --focus:#F2B84B;
+
+  /* Type */
+  --display:'Bricolage Grotesque','Segoe UI',system-ui,-apple-system,sans-serif;
+  --body:'Source Sans 3','Segoe UI',system-ui,-apple-system,sans-serif;
+  --fs-2xs:.8125rem;  /* 13: labels only */
+  --fs-xs:.9375rem;   /* 15 */
+  --fs-sm:1rem;       /* 16 */
+  --fs-base:1.125rem; /* 18: larger default for older readers */
+  --fs-md:1.25rem;    /* 20 */
+  --fs-lg:1.5rem;     /* 24 */
+  --fs-xl:clamp(1.875rem,1.35rem + 2vw,2.625rem);
+  --fs-hero:clamp(2.5rem,1.6rem + 4.2vw,4.25rem);
+
+  /* Spacing scale (4px base) */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+
+  /* Shape and depth */
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:24px;
+  --shadow:0 1px 2px rgba(11,42,58,.06),0 6px 20px rgba(11,42,58,.05);
+  --shadow-lg:0 2px 4px rgba(3,15,22,.12),0 28px 64px rgba(3,15,22,.32);
+
+  --max:1200px;
+
+  /* Pacific motifs as tiny inline SVG (no extra downloads) */
+  /* Stick-chart inspired: swell lines with island points, after Marshallese navigation charts */
+  --motif-chart:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280' viewBox='0 0 280 280'%3E%3Cg fill='none' stroke='%237FD1C7' stroke-opacity='.10' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M0 70 Q70 30 140 70 T280 70'/%3E%3Cpath d='M0 210 Q70 170 140 210 T280 210'/%3E%3Cpath d='M40 0 L240 280'/%3E%3Cpath d='M240 0 L40 280'/%3E%3Cpath d='M140 0 V280'/%3E%3C/g%3E%3Cg fill='%237FD1C7' fill-opacity='.2'%3E%3Ccircle cx='140' cy='140' r='3.5'/%3E%3Ccircle cx='90' cy='70' r='2.5'/%3E%3Ccircle cx='190' cy='210' r='2.5'/%3E%3Ccircle cx='40' cy='210' r='2'/%3E%3Ccircle cx='240' cy='70' r='2'/%3E%3C/g%3E%3C/svg%3E");
+  /* Light stick-chart for pale surfaces */
+  --motif-chart-ink:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280' viewBox='0 0 280 280'%3E%3Cg fill='none' stroke='%230B6E6E' stroke-opacity='.06' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M0 70 Q70 30 140 70 T280 70'/%3E%3Cpath d='M0 210 Q70 170 140 210 T280 210'/%3E%3Cpath d='M40 0 L240 280'/%3E%3Cpath d='M240 0 L40 280'/%3E%3C/g%3E%3C/svg%3E");
+  /* Woven / tapa-inspired band: alternating triangles */
+  --motif-weave:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'%3E%3Cpath d='M0 10 L6 0 L12 10 Z' fill='%23B5501E' fill-opacity='.55'/%3E%3Cpath d='M12 0 L18 10 L24 0 Z' fill='%230B2A3A' fill-opacity='.85'/%3E%3C/svg%3E");
+  --motif-weave-light:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'%3E%3Cpath d='M0 10 L6 0 L12 10 Z' fill='%237FD1C7' fill-opacity='.55'/%3E%3Cpath d='M12 0 L18 10 L24 0 Z' fill='%23F6EBDD' fill-opacity='.35'/%3E%3C/svg%3E");
+  --select-arrow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230B2A3A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* ==========================================================
+   Base
+   ========================================================== */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 12px);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:var(--fs-base);line-height:1.6;padding-bottom:env(safe-area-inset-bottom,0px);overflow-x:hidden}
+img,svg{max-width:100%}
+a{color:var(--teal);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--ocean)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+h1,h2,h3{color:var(--ink-strong);margin:0;text-wrap:balance}
+h1,h2{font-family:var(--display);font-weight:700;letter-spacing:-.015em}
+h2{font-size:var(--fs-xl);line-height:1.12;margin-bottom:var(--s3)}
+h3{font-size:var(--fs-md);line-height:1.25;margin-bottom:var(--s2);font-weight:700}
+p{margin:0}
+ul,ol{margin:0;padding:0}
+table{border-collapse:collapse;width:100%}
+.wrap{max-width:var(--max);margin:0 auto;padding-inline:var(--s4)}
+.section{padding-block:var(--s7)}
+.section-head{display:grid;gap:var(--s3);margin-bottom:var(--s6)}
+.section-head h2{margin-bottom:0;max-width:20ch}
+.lead{color:var(--muted);font-size:var(--fs-md);max-width:620px}
+.skip{position:absolute;left:-9999px;top:0;background:#fff;color:var(--ocean);padding:var(--s3) var(--s4);z-index:50;font-weight:700}
+.skip:focus{left:var(--s3);top:var(--s3)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Eyebrow labels give each section a clear, product-like index */
+.eyebrow{display:inline-flex;align-items:center;gap:var(--s2);font-size:var(--fs-2xs);font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)}
+.eyebrow::before{content:"";width:20px;height:2px;background:currentColor;border-radius:2px}
+.eyebrow-num{font-variant-numeric:tabular-nums;color:var(--muted)}
+.on-dark .eyebrow,.eyebrow.on-dark{color:var(--lagoon)}
+
+/* Woven band used to mark key transitions */
+.weave{height:10px;background:var(--motif-weave) repeat-x left center;background-size:24px 10px}
+.weave-light{background-image:var(--motif-weave-light)}
+.weave-thin{height:6px;background-size:14px 6px}
+
+/* Placeholders: visible, dashed, impossible to miss before launch */
+.placeholder{display:flex;align-items:center;justify-content:center;min-height:56px;padding:var(--s2) var(--s3);border:1.5px dashed var(--line-strong);border-radius:var(--r-sm);color:var(--muted);font-size:var(--fs-2xs);font-weight:600;text-align:center;background:var(--surface)}
+.ph{background:#FFF7E3;border-bottom:1.5px dashed #C9A24A;padding:0 .2em;border-radius:3px;font-weight:600;color:inherit}
+.on-dark .ph,.aud-org .ph{background:rgba(242,184,75,.16);border-bottom-color:var(--focus)}
+
+/* ==========================================================
+   Buttons
+   ========================================================== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:52px;padding:var(--s3) var(--s5);border-radius:var(--r-md);font-weight:700;text-decoration:none;font-family:inherit;font-size:var(--fs-base);line-height:1.2;cursor:pointer;border:2px solid transparent;text-align:center;transition:background-color .15s,border-color .15s,color .15s}
+.btn-primary{background:var(--lagoon);color:var(--ocean);border-color:var(--lagoon)}
+.btn-primary:hover{background:#9EDFD6;border-color:#9EDFD6;color:var(--ocean)}
+.btn-dark{background:var(--ocean);color:#fff;border-color:var(--ocean)}
+.btn-dark:hover{background:var(--teal-dark);border-color:var(--teal-dark);color:#fff}
+.btn-outline{border-color:var(--lagoon);color:#fff;background:transparent}
+.btn-outline:hover{background:var(--ocean-2);color:#fff}
+.btn-line{border-color:var(--line-strong);color:var(--ink-strong);background:var(--surface)}
+.btn-line:hover{border-color:var(--teal);color:var(--teal-dark)}
+.btn-sm{min-height:44px;padding:var(--s2) var(--s4);font-size:var(--fs-sm)}
+.btn svg{flex:none}
+.link-arrow{display:inline-flex;align-items:center;gap:6px;font-weight:700;text-decoration:none}
+.link-arrow:hover{text-decoration:underline}
+
+/* ==========================================================
+   Independence bar + header
+   ========================================================== */
+.util{background:var(--ocean-950);color:var(--on-dark-muted);font-size:var(--fs-xs);padding-top:env(safe-area-inset-top,0px)}
+.util .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s1) var(--s5);padding-block:var(--s2)}
+.util p{display:flex;align-items:flex-start;gap:var(--s2);line-height:1.4}
+.util p svg{flex:none;margin-top:1px}
+.util strong{color:#fff;font-weight:600}
+.util a{color:var(--lagoon);font-weight:600;text-decoration:none;display:none}
+.util a:hover{color:#fff;text-decoration:underline}
+
+.site-header{background:var(--ocean);color:#fff;border-bottom:1px solid var(--ocean-3);position:relative;z-index:20}
+.header-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s3) var(--s4);padding-block:var(--s3)}
+.brand{display:flex;align-items:center;gap:var(--s3);color:#fff;text-decoration:none;min-width:0}
+.brand:hover{color:#fff}
+.brand svg{flex:none}
+.brand-name{display:block;font-family:var(--display);font-weight:700;font-size:var(--fs-md);line-height:1.15;letter-spacing:-.01em}
+.brand-tag{display:block;font-size:.8125rem;color:var(--on-dark-muted);line-height:1.3}
+/* Keep the full desktop nav on one row; the tagline stays in the footer and the independence bar */
+@media (min-width:1200px){.site-header .brand-tag{display:none}}
+.menu-btn{display:none;align-items:center;gap:var(--s2);min-height:44px;padding:var(--s2) var(--s3);border:1px solid var(--ocean-3);border-radius:var(--r-sm);background:var(--ocean-2);color:#fff;font:inherit;font-size:var(--fs-sm);font-weight:600;cursor:pointer}
+.menu-btn .bar-close{display:none}
+.menu-btn[aria-expanded="true"] .bar-open{display:none}
+.menu-btn[aria-expanded="true"] .bar-close{display:block}
+.nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s1) var(--s5);width:100%}
+.nav a:not(.btn){color:#fff;text-decoration:none;font-weight:600;font-size:var(--fs-sm);padding:var(--s3) 0;border-bottom:2px solid transparent}
+.nav a:not(.btn):hover{border-bottom-color:var(--lagoon);color:#fff}
+.nav .btn{margin-left:auto}
+/* With JS, the small-screen nav collapses behind an accessible toggle. Without JS it simply stays open. */
+@media (max-width:1199px){
+  .js .menu-btn{display:inline-flex}
+  .js .nav{display:none;flex-direction:column;align-items:stretch;gap:0;padding-bottom:var(--s3)}
+  .js .nav.open{display:flex}
+  .js .nav a:not(.btn){padding:var(--s3) 0;border-bottom:1px solid var(--ocean-3)}
+  .js .nav .btn{margin:var(--s4) 0 0}
+}
+
+/* ==========================================================
+   Hero: the promise and the submission flow, side by side
+   ========================================================== */
+.hero{position:relative;color:#fff;padding-top:var(--s7);overflow:hidden;background:radial-gradient(900px 520px at 88% -8%,rgba(127,209,199,.16),transparent 62%),radial-gradient(700px 420px at -10% 110%,rgba(181,80,30,.10),transparent 60%),var(--ocean)}
+.hero::before{content:"";position:absolute;inset:0;background:var(--motif-chart);background-size:280px 280px;pointer-events:none}
+.hero-grid{position:relative;display:grid;gap:var(--s6);grid-template-areas:"intro" "console" "flags"}
+.hero-intro{grid-area:intro}
+.hero-flags{grid-area:flags}
+.console{grid-area:console}
+.hero-kicker{display:inline-flex;align-items:center;gap:var(--s2);color:var(--lagoon);font-weight:700;font-size:var(--fs-sm);margin-bottom:var(--s4);padding:6px var(--s3) 6px var(--s2);border:1px solid rgba(127,209,199,.35);border-radius:999px;background:rgba(127,209,199,.08)}
+.hero h1{color:#fff;font-size:var(--fs-hero);line-height:1.02;margin-bottom:var(--s5);max-width:13ch;letter-spacing:-.025em}
+.hero h1 em{font-style:normal;color:var(--lagoon)}
+.hero-text{font-size:var(--fs-md);color:var(--on-dark);max-width:540px;margin-bottom:var(--s6)}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s3)}
+.actions .btn{flex:1 1 240px}
+
+.hero-flags{border-top:1px solid var(--ocean-3);padding-top:var(--s5)}
+.flags-title{font-family:var(--display);font-weight:700;font-size:var(--fs-md);margin-bottom:var(--s4);color:#fff}
+.flags{list-style:none;display:grid;gap:var(--s3)}
+.flags li{display:flex;gap:var(--s3);align-items:flex-start;color:var(--on-dark);line-height:1.45}
+.flags .ico{flex:none;width:36px;height:36px;border-radius:50%;background:rgba(127,209,199,.12);border:1px solid rgba(127,209,199,.22);display:flex;align-items:center;justify-content:center}
+.wave{display:block;width:100%;height:56px;margin-top:var(--s7)}
+
+/* Submission console */
+.console{position:relative;background:var(--surface);color:var(--ink);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid rgba(127,209,199,.4);align-self:start}
+.console-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s2) var(--s3);padding:var(--s4) var(--s5);border-bottom:1px solid var(--line);background:var(--surface)}
+.console-head h2{font-size:1.5rem;margin:0;letter-spacing:-.01em}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:var(--fs-2xs);font-weight:700;letter-spacing:.02em;background:var(--lagoon-soft);color:var(--teal-dark);border:1px solid var(--lagoon-200);white-space:nowrap}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--teal)}
+.console-sub{padding:var(--s4) var(--s5) 0;color:var(--muted);font-size:var(--fs-sm)}
+.route{margin:var(--s4) var(--s5) 0;padding:var(--s4);border:1px solid var(--line);border-radius:var(--r-md);background:var(--ground)}
+.route-label{display:flex;align-items:center;gap:var(--s2);font-size:var(--fs-2xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--s2)}
+.route-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--ocean);color:var(--lagoon);font-size:.75rem;letter-spacing:0}
+.route-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);justify-content:space-between}
+.route-email{font-size:var(--fs-md);font-weight:700;overflow-wrap:anywhere;color:var(--teal-dark)}
+.route-email:hover{color:var(--ocean)}
+.copy-btn{display:none}
+.has-clipboard .copy-btn{display:inline-flex}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-result{padding:var(--s3) var(--s4);border-radius:var(--r-sm);font-size:var(--fs-sm);line-height:1.45;border:1px solid var(--line);background:var(--ground);color:var(--ink-strong)}
+.form-result.is-ok{background:var(--lagoon-soft);border-color:var(--lagoon-200);color:var(--teal-dark)}
+.form-result.is-error{background:var(--coral-soft);border-color:var(--coral-line);color:var(--coral-ink)}
+.form-result strong{display:block}
+.field-hint{margin:2px 0 0;font-size:var(--fs-xs);color:var(--muted)}
+.copy-status{font-size:var(--fs-xs);color:var(--teal-dark);font-weight:600;min-height:1.2em}
+.or{display:flex;align-items:center;gap:var(--s3);margin:var(--s4) var(--s5) 0;color:var(--muted);font-size:var(--fs-2xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.check-form{padding:var(--s4) var(--s5) var(--s5);display:flex;flex-direction:column;gap:var(--s2)}
+.check-form .route-label{margin-bottom:0}
+.field-row{display:grid;gap:var(--s2) var(--s4)}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:var(--s2)}
+.check-form label{font-weight:600;color:var(--ink-strong);font-size:var(--fs-sm)}
+.check-form .opt{font-weight:400;color:var(--muted)}
+.check-form input[type=email],.check-form input[type=text],.check-form select,.check-form textarea{min-height:52px;border-radius:var(--r-sm);border:1px solid var(--line-strong);background:#fff;padding:var(--s3) var(--s4);font:inherit;font-size:var(--fs-sm);color:var(--ocean);width:100%;transition:border-color .15s,box-shadow .15s}
+.check-form input:hover,.check-form select:hover,.check-form textarea:hover{border-color:#8FAAB1}
+.check-form input:focus,.check-form select:focus,.check-form textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(11,110,110,.15)}
+.check-form select{appearance:none;-webkit-appearance:none;background:#fff var(--select-arrow) no-repeat right 14px center;padding-right:40px}
+.check-form textarea{min-height:96px;resize:vertical}
+.check-form input[type=file]{font:inherit;font-size:var(--fs-sm);color:var(--muted);padding:var(--s3);border:1.5px dashed var(--line-strong);border-radius:var(--r-sm);width:100%;background:var(--ground)}
+.check-form input[type=file]::file-selector-button{font:inherit;font-weight:600;margin-right:var(--s3);padding:var(--s2) var(--s4);border-radius:var(--r-sm);border:0;background:var(--lagoon-soft);color:var(--ocean);cursor:pointer}
+.alert{display:flex;gap:var(--s3);align-items:flex-start;margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--coral-soft);border:1px solid var(--coral-line);border-left:4px solid var(--coral);border-radius:var(--r-sm);color:var(--coral-ink);font-size:var(--fs-sm);line-height:1.45}
+.alert svg{flex:none;margin-top:2px}
+.alert strong{display:block;color:var(--coral-ink)}
+.check-form .btn{margin-top:var(--s3);width:100%}
+.form-foot{font-size:var(--fs-xs);color:var(--muted);text-align:center}
+
+/* ==========================================================
+   Assurance: independence statement + service facts
+   ========================================================== */
+.assurance{position:relative;margin-top:calc(-1 * var(--s3))}
+.trust{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.trust-grid{display:grid}
+.trust-main{display:flex;flex-direction:column;gap:var(--s4);padding:var(--s5)}
+.trust-main .ico{flex:none;width:48px;height:48px;border-radius:var(--r-md);background:var(--lagoon-soft);display:flex;align-items:center;justify-content:center}
+.trust-main h2{font-size:var(--fs-lg);margin:0}
+.trust-main strong{color:var(--ink-strong)}
+.trust-main p{color:var(--ink)}
+.facts{padding:var(--s2) var(--s5) var(--s5);border-top:1px solid var(--line)}
+.facts caption{text-align:left;padding:var(--s4) 0 var(--s2);font-size:var(--fs-2xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.facts th,.facts td{text-align:left;vertical-align:top;padding:var(--s3) 0;border-top:1px solid var(--line);font-size:var(--fs-sm)}
+.facts tr:first-child th,.facts tr:first-child td{border-top:0}
+.facts th{font-weight:600;color:var(--muted);width:42%;padding-right:var(--s4)}
+.facts td{color:var(--ink-strong);font-weight:600}
+.trust-slots{list-style:none;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s3);padding:var(--s4) var(--s5);background:var(--ground);border-top:1px solid var(--line)}
+.point{display:flex;gap:var(--s3);align-items:flex-start;padding:var(--s3);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm)}
+.point-ico{flex:none;width:50px;height:50px;border-radius:var(--r-md);background:var(--lagoon-soft);display:flex;align-items:center;justify-content:center}
+.point-text{display:flex;flex-direction:column;gap:2px;font-size:var(--fs-xs);line-height:1.45;color:var(--muted)}
+.point-text strong{font-family:var(--display);font-weight:700;font-size:var(--fs-sm);color:var(--ink-strong)}
+
+/* ==========================================================
+   Cards and grids
+   ========================================================== */
+.grid{display:grid;gap:var(--s4)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s5);box-shadow:var(--shadow)}
+.card p{color:var(--ink)}
+
+/* How it works: connected stepper, like a voyaging route */
+.steps{list-style:none;position:relative}
+.step{position:relative;display:flex;flex-direction:column;gap:var(--s2)}
+.step-top{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s3)}
+.step-num{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ocean);color:var(--lagoon);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:var(--fs-md,1.25rem)}
+.step-label{margin-left:auto;padding:3px 10px;border-radius:999px;background:var(--lagoon-soft);color:#0B6E6E;font-size:var(--fs-2xs);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.step-label.us{background:var(--ocean);color:var(--lagoon)}
+.step h3{margin-bottom:0}
+.checklist{list-style:none;display:grid;gap:var(--s2);margin-top:var(--s3);padding-top:var(--s3);border-top:1px solid var(--line)}
+.checklist li{display:flex;gap:var(--s2);align-items:flex-start;font-size:var(--fs-sm);color:var(--ink)}
+.checklist svg{flex:none;margin-top:4px}
+
+/* Scam library modules */
+.scam{display:flex;flex-direction:column;gap:var(--s3);transition:border-color .15s}
+.scam:hover{border-color:var(--line-strong)}
+.scam-top{display:flex;align-items:center;justify-content:space-between;gap:var(--s3)}
+.scam-ico{width:48px;height:48px;border-radius:var(--r-md);background:var(--lagoon-soft);display:flex;align-items:center;justify-content:center}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--ground);font-size:var(--fs-2xs);font-weight:700;color:var(--muted);letter-spacing:.02em}
+.scam h3{margin-bottom:0}
+.scam-pattern{color:var(--ink)}
+.safe{margin-top:auto;padding-top:var(--s3);border-top:1px dashed var(--line-strong);display:flex;gap:var(--s2);align-items:flex-start;font-size:var(--fs-sm);color:var(--ink-strong)}
+.safe svg{flex:none;margin-top:3px}
+.safe b{color:var(--teal-dark)}
+
+/* ==========================================================
+   Already scammed: incident response playbook
+   ========================================================== */
+.help-panel{background:var(--sand);border:1px solid var(--sand-deep);border-radius:var(--r-xl);overflow:hidden}
+.help-body{display:grid;gap:var(--s6);padding:var(--s6) var(--s5)}
+.help-kicker{display:inline-flex;align-items:center;gap:var(--s2);color:var(--coral-ink);font-weight:700;font-size:var(--fs-2xs);letter-spacing:.09em;text-transform:uppercase;margin-bottom:var(--s3)}
+.help-intro h2{max-width:16ch}
+.help-intro p{font-size:var(--fs-md)}
+.help-intro .btn{margin-top:var(--s5)}
+.playbook{list-style:none;display:grid;gap:var(--s3)}
+.playbook li{background:var(--surface);border:1px solid var(--sand-deep);border-radius:var(--r-md);padding:var(--s4) var(--s5);display:flex;gap:var(--s4);align-items:flex-start}
+.help-num{flex:none;width:36px;height:36px;border-radius:50%;background:var(--coral);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.playbook strong{display:block;color:var(--ink-strong);font-size:var(--fs-md);line-height:1.3;margin-bottom:2px}
+.playbook p{color:var(--ink)}
+.report{padding:0 var(--s5) var(--s6)}
+.report-card{background:var(--surface);border:1px solid var(--sand-deep);border-radius:var(--r-md);overflow:hidden}
+.report-card h3{padding:var(--s4) var(--s5) var(--s1);margin:0;font-size:var(--fs-md)}
+.report-card > p{padding:0 var(--s5) var(--s4);color:var(--muted);font-size:var(--fs-sm)}
+.report-pick{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3);padding:0 var(--s5) var(--s4)}
+.report-pick label{font-weight:600;color:var(--ink-strong);font-size:var(--fs-sm)}
+.report-pick select{min-height:44px;min-width:220px;max-width:100%;padding:8px 36px 8px 12px;border:1.5px solid var(--line-strong);border-radius:var(--r-sm);background:var(--surface);font:inherit;color:var(--ink-strong)}
+.report-list{border-top:1px solid var(--sand-deep)}
+.report-country{padding:var(--s4) var(--s5);border-bottom:1px solid var(--sand-deep)}
+.report-country h4{margin:0 0 var(--s2);font-family:var(--display);font-size:var(--fs-sm);color:var(--ink-strong)}
+.report-country dl{margin:0;display:grid;gap:var(--s2)}
+.report-country dl div{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr);gap:var(--s3)}
+.report-country dt{color:var(--muted);font-size:var(--fs-xs)}
+.report-country dd{margin:0;font-weight:600;color:var(--ink-strong);font-size:var(--fs-sm);overflow-wrap:anywhere}
+.report-country a{color:#0B6E6E}
+.js .report-country{display:none}
+.js .report-country.is-shown{display:block;border-bottom:0}
+.js .report-list:not(.has-choice){border-top:0}
+.report-pick.js-only{display:none}
+.js .report-pick.js-only{display:flex}
+.report-note{padding:var(--s3) var(--s5) var(--s4);margin:0;color:var(--muted);font-size:var(--fs-2xs);border-top:1px solid var(--sand-deep);background:#FBF5EC}
+@media (max-width:639px){
+  .report-country dl div{grid-template-columns:1fr;gap:0}
+  .report-pick select{width:100%}
+}
+
+/* ==========================================================
+   Who we help: service tiers by audience
+   ========================================================== */
+.tier-group + .tier-group{margin-top:var(--s7)}
+.tier-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--s2) var(--s4);padding-bottom:var(--s3);margin-bottom:var(--s4);border-bottom:1px solid var(--line-strong)}
+.tier-head h3{font-family:var(--display);font-size:var(--fs-lg);margin:0}
+.tier-head p{color:var(--muted);font-size:var(--fs-sm)}
+.tier-head code{font-family:inherit;font-weight:700;color:var(--teal-dark)}
+.audience{list-style:none}
+.aud{display:flex;flex-direction:column;gap:var(--s3);height:100%}
+.aud-top{display:flex;align-items:center;justify-content:space-between;gap:var(--s3)}
+.aud-ico{width:52px;height:52px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center}
+.aud h4{font-family:var(--display);font-size:var(--fs-lg);line-height:1.2;margin:0;color:var(--ink-strong);letter-spacing:-.01em}
+.aud-desc{font-size:var(--fs-md);line-height:1.45}
+.incl{list-style:none;display:grid;gap:var(--s2);padding-top:var(--s3);border-top:1px solid var(--line);font-size:var(--fs-sm)}
+.incl li{display:flex;gap:var(--s2);align-items:flex-start}
+.incl svg{flex:none;margin-top:4px}
+.aud-cta{margin-top:auto;padding-top:var(--s4);display:flex;flex-direction:column;gap:var(--s3)}
+.aud-cta .btn{width:100%}
+.aud-community .aud-ico{background:var(--lagoon-soft)}
+.chip-free{background:var(--lagoon-soft)}
+.aud-org{background:var(--ocean);border-color:var(--ocean);color:var(--on-dark);position:relative;overflow:hidden}
+.aud-org::before{content:"";position:absolute;inset:0;background:var(--motif-chart);background-size:280px 280px;opacity:.6;pointer-events:none}
+.aud-org > *{position:relative}
+.aud-org h4{color:#fff}
+.aud-org p,.aud-org li{color:var(--on-dark)}
+.aud-org .incl{border-top-color:var(--ocean-3)}
+.aud-org .aud-ico{background:var(--ocean-2);border:1px solid var(--ocean-3)}
+.aud-org .chip{background:var(--ocean-2);border-color:var(--ocean-3);color:var(--lagoon)}
+.aud-org .chip .dot{background:var(--lagoon)}
+.aud-org a:not(.btn){color:var(--lagoon)}
+.aud-org a:not(.btn):hover{color:#fff}
+
+/* Contact routing */
+.routing{margin-top:var(--s6);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.routing-head{padding:var(--s4) var(--s5);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s2) var(--s4);align-items:baseline}
+.routing-head h3{margin:0;font-size:var(--fs-md)}
+.routing-head p{color:var(--muted);font-size:var(--fs-sm)}
+.routing-grid{display:grid}
+.route-opt{display:flex;flex-direction:column;gap:var(--s2);padding:var(--s5)}
+.route-opt + .route-opt{border-top:1px solid var(--line)}
+.route-opt .route-label{margin:0}
+.route-opt a.big{font-size:var(--fs-md);font-weight:700;overflow-wrap:anywhere}
+.route-opt p{color:var(--ink);font-size:var(--fs-sm)}
+
+/* ==========================================================
+   Privacy and data handling
+   ========================================================== */
+.privacy-layout{display:grid;gap:var(--s6)}
+.privacy-intro .lead{margin-top:var(--s3)}
+.never{margin-top:var(--s5);background:var(--coral-soft);border:1px solid var(--coral-line);border-radius:var(--r-lg);padding:var(--s5)}
+.never h3{display:flex;align-items:center;gap:var(--s2);color:var(--coral-ink);font-size:var(--fs-md)}
+.never ul{list-style:none;display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}
+.never li{padding:4px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--coral-line);color:var(--coral-ink);font-weight:700;font-size:var(--fs-sm)}
+.never p{color:var(--coral-ink);font-size:var(--fs-sm)}
+.data-table{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.data-table caption{text-align:left;padding:var(--s4) var(--s5);font-family:var(--display);font-weight:700;font-size:var(--fs-md);color:var(--ink-strong);background:var(--surface);border:1px solid var(--line);border-bottom:0;border-radius:var(--r-lg) var(--r-lg) 0 0}
+.data-table th,.data-table td{text-align:left;vertical-align:top;padding:var(--s4) var(--s5);border-top:1px solid var(--line)}
+.data-table th{width:34%;font-size:var(--fs-sm);color:var(--ink-strong);font-weight:700}
+.data-table th span{display:flex;align-items:center;gap:var(--s2)}
+.data-table th svg{flex:none}
+.data-table td{font-size:var(--fs-sm);color:var(--ink)}
+.data-table td strong{display:block;color:var(--ink-strong);font-size:var(--fs-base)}
+.data-wrap{border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.data-wrap table{background:var(--surface);border:1px solid var(--line);border-top:0;border-radius:0 0 var(--r-lg) var(--r-lg)}
+.policy-link{margin-top:var(--s4);font-size:var(--fs-sm);color:var(--muted)}
+@media (max-width:639px){
+  .data-table th,.data-table td{display:block;width:100%}
+  .data-table td{border-top:0;padding-top:0}
+}
+
+/* ==========================================================
+   About
+   ========================================================== */
+.about-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--shadow);padding:var(--s6) var(--s5);display:flex;flex-wrap:wrap;gap:var(--s6);align-items:center;overflow:hidden}
+.about-card::before{content:"";position:absolute;inset:0;background:var(--motif-chart-ink);background-size:280px 280px;pointer-events:none}
+.about-card > *{position:relative}
+.photo{flex:none;width:144px;height:144px;border-radius:50%;background:var(--lagoon-soft);border:2px dashed var(--line-strong);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;text-align:center;font-size:var(--fs-xs);font-weight:600;padding:var(--s3)}
+.about-copy{flex:1 1 420px;min-width:0}
+.about-copy h2{margin-top:var(--s2)}
+.about-copy p+p{margin-top:var(--s3)}
+.meta{color:var(--muted);padding-top:var(--s3);border-top:1px solid var(--line)}
+
+/* ==========================================================
+   Footer
+   ========================================================== */
+.site-footer{background:var(--ocean);color:var(--on-dark-muted);font-size:var(--fs-sm)}
+.footer-grid{display:grid;gap:var(--s6);padding-block:var(--s7)}
+.footer-brand p{max-width:440px;margin-top:var(--s4)}
+.footer-col h2{font-family:var(--body);font-size:var(--fs-2xs);font-weight:700;color:#fff;margin-bottom:var(--s3);letter-spacing:.09em;text-transform:uppercase}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:var(--s1)}
+.footer-col a{color:var(--on-dark);text-decoration:none;display:inline-block;padding-block:var(--s1);overflow-wrap:anywhere}
+.footer-col a:hover{color:#fff;text-decoration:underline}
+.footer-col .placeholder{background:transparent;border-color:var(--ocean-3);color:var(--on-dark-muted);justify-content:flex-start;min-height:44px;margin-top:var(--s2)}
+.footer-bottom{border-top:1px solid var(--ocean-3)}
+.footer-bottom .wrap{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s6);justify-content:space-between;align-items:center;padding-block:var(--s5)}
+.footer-bottom nav{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5)}
+.footer-bottom a{color:#fff}
+.footer-bottom a:hover{color:var(--lagoon)}
+
+/* ==========================================================
+   Larger screens (mobile-first)
+   ========================================================== */
+@media (min-width:640px){
+  .wrap{padding-inline:var(--s6)}
+  .section{padding-block:var(--s8)}
+  .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .field-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .help-body{padding:var(--s7)}
+  .report{padding:0 var(--s7) var(--s7)}
+  .about-card{padding:var(--s7)}
+  .trust-main{padding:var(--s6)}
+  .facts{padding:var(--s2) var(--s6) var(--s5)}
+  .trust-slots{padding:var(--s4) var(--s6)}
+  .routing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .route-opt + .route-opt{border-top:0;border-left:1px solid var(--line)}
+  .footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .actions .btn{flex:0 1 auto}
+  .util a{display:inline}
+}
+@media (min-width:900px){
+  html{scroll-padding-top:88px}
+  .site-header{position:sticky;top:0}
+  .hero{padding-top:var(--s8)}
+  .hero-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:auto 1fr;grid-template-areas:"intro console" "flags console";gap:var(--s6) var(--s8)}
+  .hero-flags{align-self:start}
+  .flags{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4) var(--s5)}
+  .hero .to-form{display:none}
+  .section-head{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:end;gap:var(--s7)}
+  .section-head .eyebrow{grid-column:1 / -1;margin-bottom:calc(-1 * var(--s4))}
+  .section-head .lead{justify-self:end}
+  .trust-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+  .facts{border-top:0;border-left:1px solid var(--line);padding:var(--s2) var(--s6) var(--s5)}
+  .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .steps{gap:var(--s5)}
+  .help-body{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:var(--s7)}
+  .privacy-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:var(--s7);align-items:start}
+  .footer-grid{grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr))}
+}
+@media (min-width:1200px){
+  .nav{width:auto;gap:var(--s1) 18px}
+  .nav .btn{margin-left:var(--s2)}
+}
+@media (min-width:1100px){
+  .hero h1{max-width:12ch}
+}
+
+/* Print: plain and ink-light, for community noticeboards */
+@media print{
+  .hero::before,.aud-org::before,.about-card::before,.weave,.wave,.check-form,.or,.copy-btn,.copy-status,.skip,.nav,.menu-btn,.actions,.aud-cta .btn{display:none!important}
+  .hero,.site-header,.site-footer,.util,.aud-org{background:#fff!important;color:#000!important}
+  .hero h1,.hero h1 em,.aud-org h4,.aud-org p,.aud-org li,.flags-title,.flags li,.hero-text,.hero-kicker,.util strong,.brand,.brand-name,.brand-tag{color:#000!important}
+  .site-header{position:static}
+  .card,.trust,.about-card,.console,.routing,.data-wrap{box-shadow:none}
+  .console{border:1px solid #999}
+  a[href^="mailto:"]::after{content:""}
+}
+
+.legal{padding:var(--s7) 0 var(--s8)}
+.legal .wrap{max-width:780px}
+.legal .back{display:inline-block;margin-bottom:var(--s5);color:var(--teal);font-weight:600;text-decoration:none}
+.legal .back:hover{text-decoration:underline}
+.legal h1{font-family:var(--display);font-size:var(--fs-xl);line-height:1.1;margin:0 0 var(--s2);color:var(--ink-strong)}
+.legal .updated{color:var(--muted);font-size:var(--fs-xs);margin:0 0 var(--s5)}
+.legal .intro{font-size:var(--fs-md);color:var(--ink)}
+.legal h2{font-size:var(--fs-lg);margin:var(--s7) 0 var(--s3);padding-top:var(--s5);border-top:1px solid var(--line)}
+.legal h3{font-size:var(--fs-base);margin:var(--s5) 0 var(--s2)}
+.legal p,.legal li{max-width:68ch}
+.legal ul{padding-left:1.25em;margin:var(--s2) 0 var(--s4)}
+.legal li{margin-bottom:var(--s2)}
+.legal a{color:var(--teal)}
+.legal .principle{margin-top:var(--s7);padding:var(--s5);background:var(--lagoon-soft);border-radius:var(--r-md);color:var(--ink-strong)}
+.legal .principle strong{display:block;font-family:var(--display);font-size:var(--fs-md);margin-bottom:var(--s2)}
+</style>
+</head>
+<body>
+<!-- Logo, drawn once and reused in the header and footer. Hidden with zero size (not display:none) so its gradient still renders. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="sw-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F6DB8A"/>
+      <stop offset=".5" stop-color="#D9A93A"/>
+      <stop offset="1" stop-color="#F0CB66"/>
+    </linearGradient>
+    <linearGradient id="sw-star" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3CF6A"/>
+      <stop offset="1" stop-color="#B9861F"/>
+    </linearGradient>
+    <clipPath id="sw-right"><rect x="50" y="0" width="50" height="120"/></clipPath>
+  </defs>
+  <symbol id="sw-logo" viewBox="0 0 100 120">
+    <!-- Seven-point star -->
+    <path d="M50 2 51.8 8.4 57.8 5.8 53.9 11.1 59.8 14.2 53.1 14.5 54.3 21 50 16 45.7 21 46.9 14.5 40.2 14.2 46.1 11.1 42.2 5.8 48.2 8.4Z" fill="url(#sw-star)"/>
+    <path d="M50 2 51.8 8.4 50 12Z M57.8 5.8 53.9 11.1 50 12Z M59.8 14.2 53.1 14.5 50 12Z M54.3 21 50 16 50 12Z M45.7 21 46.9 14.5 50 12Z M40.2 14.2 46.1 11.1 50 12Z M42.2 5.8 48.2 8.4 50 12Z" fill="#8F6514" fill-opacity=".28"/>
+    <!-- Shield: outer navy, gold border, two-tone field -->
+    <path d="M10 32Q50 22 90 32V68C90 94 72 108 50 118 28 108 10 94 10 68Z" fill="#0F1E45"/>
+    <path d="M19 39Q50 31 81 39V68C81 89 67 101 50 109 33 101 19 89 19 68Z" fill="#1C2D5E"/>
+    <path d="M19 39Q50 31 81 39V68C81 89 67 101 50 109 33 101 19 89 19 68Z" fill="#0E1B40" clip-path="url(#sw-right)"/>
+    <path d="M19 39Q50 31 81 39V68C81 89 67 101 50 109 33 101 19 89 19 68Z" fill="none" stroke="url(#sw-gold)" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- Monogram -->
+    <text x="50" y="81" text-anchor="middle" font-family="'Source Sans 3','Segoe UI',Arial,sans-serif" font-weight="700" font-size="38" letter-spacing="-1" fill="#fff" stroke="#0B1530" stroke-width="2" paint-order="stroke">Sw</text>
+  </symbol>
+</svg>
+<a class="skip" href="index.html#main">Skip to content</a>
+
+<!-- Independence statement, visible on every screen size -->
+<div class="util">
+  <div class="wrap">
+    <p><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7FD1C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l8 3v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z"/></svg><span><strong>Independent service.</strong> Not a government agency, bank, telco or police service.</span></p>
+    <a href="mailto:check@scamwatcherpacific.com">check@scamwatcherpacific.com</a>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <svg class="brand-logo" width="46" height="55" aria-hidden="true" focusable="false"><use href="#sw-logo"/></svg>
+      <span>
+        <span class="brand-name">ScamWatcher Pacific</span>
+        <span class="brand-tag">Independent scam checking for Pacific communities</span>
+      </span>
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav">
+      <svg class="bar-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <svg class="bar-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      Menu
+    </button>
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#scams">Common scams</a>
+      <a href="index.html#help">Already scammed?</a>
+      <a href="index.html#who">Who we help</a>
+      <a href="index.html#privacy">Privacy</a>
+      <a href="index.html#about">About</a>
+      <a class="btn btn-primary btn-sm" href="index.html#check">Get it checked</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="legal">
+  <div class="wrap">
+    <a class="back" href="index.html">← Back to ScamWatcher Pacific</a>
+
+<h1>Privacy policy</h1>
+<p class="updated">Last updated: October 2026</p>
+<p class="intro">ScamWatcher Pacific is an independent scam-checking service for Pacific communities. People send us messages they're unsure about, and those messages often contain names, phone numbers or account details. This policy explains what we collect, why, who sees it, and how long we keep it.</p>
+<p>ScamWatcher Pacific is not a government agency, bank, telco or police service, and is not affiliated with the Australian Government's Scamwatch.</p>
+
+<h2>1. What we collect</h2>
+<h3>When you email us a message to check</h3>
+<p>When you forward a message to <a href="mailto:check@scamwatcherpacific.com">check@scamwatcherpacific.com</a>, we receive the whole email: your email address, the forwarded message, its sender details, subject, links, attachments and any images or screenshots.</p>
+<h3>When you use the form on our website</h3>
+<p>We receive the email address you give us, your country, where you received the message, the screenshots you upload and any notes you add.</p>
+<h3>Information about other people</h3>
+<p>The messages you send us may include details about other people, such as the sender's name, phone number or account. We use these only to check the message.</p>
+<h3>When you visit our website</h3>
+<ul>
+<li>Our hosting provider keeps standard technical logs, such as your IP address, browser type and the pages requested.</li>
+<li>We use your IP address briefly to stop the same connection sending too many form submissions.</li>
+<li>Our website loads its fonts from Google Fonts, which receives your IP address when the page loads.</li>
+<li>We don't use analytics or advertising cookies. If you choose a country under "Where to report", your browser remembers that choice on your device. It is not sent to us.</li>
+</ul>
+
+<h2>2. How we use it</h2>
+<ul>
+<li>To check the message you sent and email you our assessment and advice.</li>
+<li>To answer your follow-up questions.</li>
+<li>To keep the service secure and prevent misuse.</li>
+<li>To improve how we spot scams, for example by adding a new type of scam to our checks.</li>
+</ul>
+<p>We don't sell your information, and we don't use it for marketing or advertising.</p>
+
+<h2>3. How messages are checked, including AI</h2>
+<p>Emails are checked by our own automatic checks, which look at who sent the message, what it asks for, where its links go and whether it matches a known scam.</p>
+<p>Screenshots and images are also read by an AI service, Anthropic's Claude. It reads the text in the image, translates Pacific languages into English and drafts an assessment. A member of our team checks the assessment before the reply is sent to you.</p>
+
+<h2>4. Who we share it with</h2>
+<p>We share your information only with the service providers that run ScamWatcher Pacific, and only so they can provide that service to us:</p>
+<ul>
+<li><strong>Anthropic</strong>: reads screenshots and images (AI service).</li>
+<li><strong>Render</strong>: hosts our website and review system.</li>
+<li><strong>Google Workspace</strong>: our email.</li>
+</ul>
+<p>We may also disclose information if the law requires us to.</p>
+
+<h2>5. Information handled overseas</h2>
+<p>Our review system is hosted in Singapore, our AI service is based in the United States, and our email provider stores data in several countries. By using the service, you understand that your information may be handled outside your own country. We take reasonable steps to choose providers that protect it.</p>
+
+<h2>6. How long we keep it</h2>
+<p>We keep what you send only long enough to review it and answer follow-up questions. Everything is deleted automatically after <strong>30 days</strong>: the submission, any screenshots, your email in our inbox and our reply in our sent mail.</p>
+<p>Deleted emails stay in our email provider's bin for up to 30 more days before they are removed for good. Our service providers may also keep short-term logs or backups under their own policies.</p>
+
+<h2>7. Your choices</h2>
+<ul>
+<li><strong>Delete sooner:</strong> email <a href="mailto:info@scamwatcherpacific.com?subject=Please%20delete%20what%20I%20sent">info@scamwatcherpacific.com</a> from the address you used and ask us to delete what you sent. We'll confirm once it's done.</li>
+<li><strong>Access or correct:</strong> email us from the same address to ask what we hold about you, or to correct it.</li>
+<li><strong>Share less:</strong> feel free to cover account numbers before sending a screenshot. Never send us passwords, PINs or full card numbers. We will never ask for them.</li>
+</ul>
+<p>We only act on requests that come from the email address used to send the message, so nobody can see or delete someone else's submission.</p>
+
+<h2>8. Security</h2>
+<p>Only our review team can see submissions, after signing in to our review system. Our website and review system use encrypted connections. No online service can be completely secure, but we take reasonable steps to protect what you send.</p>
+
+<h2>9. Questions and complaints</h2>
+<p>Email <a href="mailto:info@scamwatcherpacific.com">info@scamwatcherpacific.com</a>. If you aren't happy with our response, you can contact the Office of the Australian Information Commissioner at <a href="https://www.oaic.gov.au/" rel="noopener">oaic.gov.au</a>, or the privacy regulator in your country.</p>
+
+<h2>10. Changes to this policy</h2>
+<p>We may update this policy as the service changes. The date at the top shows when it last changed.</p>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="weave" aria-hidden="true"></div>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="index.html">
+        <svg class="brand-logo" width="48" height="58" aria-hidden="true" focusable="false"><use href="#sw-logo"/></svg>
+        <span>
+          <span class="brand-name">ScamWatcher Pacific</span>
+          <span class="brand-tag">Independent scam checking for Pacific communities</span>
+        </span>
+      </a>
+      <p>ScamWatcher Pacific is an independent advisory service. It is not affiliated with any government, police service, bank or telco, or with the Australian Government's Scamwatch.</p>
+    </div>
+    <nav class="footer-col" aria-labelledby="f-how">
+      <h2 id="f-how">Service</h2>
+      <ul>
+        <li><a href="index.html#how">How it works</a></li>
+        <li><a href="index.html#scams">Common scams</a></li>
+        <li><a href="index.html#help">Already scammed?</a></li>
+        <li><a href="index.html#check">Get it checked</a></li>
+        <li><a href="mailto:check@scamwatcherpacific.com">check@scamwatcherpacific.com</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col" aria-labelledby="f-org">
+      <h2 id="f-org">Organisations</h2>
+      <ul>
+        <li><a href="index.html#who">Who we help</a></li>
+        <li><a href="mailto:info@scamwatcherpacific.com">info@scamwatcherpacific.com</a></li>
+      </ul>
+    </nav>
+    <div class="footer-col">
+      <h2>Who we are</h2>
+      <ul>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#privacy">Your privacy</a></li>
+      </ul>
+      <div class="placeholder">[ABN / REGISTRATION NUMBER]</div>
+      <div class="placeholder">[LOCATION]</div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="wrap">
+      <p>© ScamWatcher Pacific</p>
+      <nav aria-label="Footer">
+        <a href="privacy.html">Privacy policy</a>
+        <a href="terms.html">Terms of use</a>
+        <a href="mailto:info@scamwatcherpacific.com">Partner with us</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  document.documentElement.classList.add('js');
+  var btn=document.querySelector('.menu-btn'), nav=document.getElementById('site-nav');
+  if(btn&&nav){btn.addEventListener('click',function(){var o=btn.getAttribute('aria-expanded')!=='true';btn.setAttribute('aria-expanded',String(o));nav.classList.toggle('open',o);});}
+})();
+</script>
+</body>
+</html>
